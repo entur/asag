@@ -9,7 +9,6 @@ import org.entur.asag.mapbox.MapBoxUpdateRouteBuilder;
 import org.entur.asag.service.BlobStoreService;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,11 +20,10 @@ import java.io.FileInputStream;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.entur.asag.mapbox.MapBoxUpdateRouteBuilder.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = MapBoxUpdateRouteBuilder.class,
+@SpringBootTest(classes = MapBoxUpdateRouteBuilder.class,
         properties = {
                 "spring.main.sources=org.entur.asag",
                 "mapbox.api.url=http4://localhost:${wiremock.server.port}",
