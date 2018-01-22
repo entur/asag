@@ -73,8 +73,6 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
 
         System.out.println("Wirremock port is: " + +wiremockServerPort);
         replaceEndpoint("mapbox-convert-upload-tiamat-data", "direct:uploadMapboxDataAws", "mock:uploadMapboxDataAws");
-//        inMemoryBlobStoreRepository.uploadBlob(blobStoreSubdirectoryForTiamatGeoCoderExport + "/" + TIAMAT_EXPORT_LATEST_FILE_NAME,
-//                new FileInputStream(new File("src/test/resources/no/rutebanken/marduk/routes/netex/stops.zip")), false);
 
         when(blobStoreService
                 .getBlob(blobStoreSubdirectoryForTiamatGeoCoderExport + "/" + TIAMAT_EXPORT_LATEST_FILE_NAME))
