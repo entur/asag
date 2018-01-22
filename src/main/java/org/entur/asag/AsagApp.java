@@ -13,8 +13,9 @@ public class AsagApp extends RouteBuilder {
 
     public static void main(String... args) {
         logger.info("Starting Asag ...");
-
-        SpringApplication.run(AsagApp.class,args);
+        SpringApplication app = new SpringApplication(AsagApp.class);
+        app.setWebEnvironment(false);
+        app.run(args);
     }
 
     @Override

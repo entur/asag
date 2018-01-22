@@ -74,59 +74,26 @@
     </dependencyManagement>
 
     <dependencies>
-
-        <!-- https://mvnrepository.com/artifact/org.geotools/gt-geojson -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.2.3.Final</version>
+        </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
             <version>18.1</version>
         </dependency>
-
         <dependency>
             <groupId>de.grundid.opendatalab</groupId>
             <artifactId>geojson-jackson</artifactId>
             <version>1.5</version>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>org.jboss.resteasy</groupId>-->
-            <!--<artifactId>resteasy-client</artifactId>-->
-            <!--<version>3.1.4.Final</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.jboss.resteasy</groupId>-->
-            <!--<artifactId>resteasy-jackson2-provider</artifactId>-->
-            <!--<version>3.1.4.Final</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.security</groupId>-->
-            <!--<artifactId>spring-security-config</artifactId>-->
-            <!--<version>${spring.security.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.security</groupId>-->
-            <!--<artifactId>spring-security-web</artifactId>-->
-            <!--<version>${spring.security.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>4.11</version>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>org.codehaus.janino</groupId>-->
-            <!--<artifactId>janino</artifactId>-->
-            <!--<version>3.0.7</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>org.beanio</groupId>-->
-            <!--<artifactId>beanio</artifactId>-->
-            <!--<version>2.1.0</version>-->
-        <!--</dependency>-->
-
         <dependency>
             <groupId>org.entur.helpers</groupId>
             <artifactId>gcp-storage</artifactId>
@@ -146,18 +113,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>org.apache.camel</groupId>-->
-            <!--<artifactId>camel-jetty9</artifactId>-->
-            <!--<version>${camel-version}</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>org.apache.camel</groupId>-->
-            <!--<artifactId>camel-jetty-common</artifactId>-->
-            <!--<version>${camel-version}</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>org.apache.camel</groupId>
@@ -181,31 +136,11 @@
             <artifactId>camel-http4</artifactId>
             <version>${camel-version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.camel</groupId>-->
-            <!--<artifactId>camel-jms</artifactId>-->
-            <!--<version>${camel-version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-spring-boot</artifactId>
             <version>${camel-version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.camel</groupId>-->
-            <!--<artifactId>camel-metrics</artifactId>-->
-            <!--<version>${camel-version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.camel</groupId>-->
-            <!--<artifactId>camel-quartz2</artifactId>-->
-            <!--<version>${camel-version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.camel</groupId>-->
-            <!--<artifactId>camel-ftp</artifactId>-->
-            <!--<version>${camel-version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jackson</artifactId>
@@ -226,49 +161,16 @@
             <artifactId>camel-jsonpath</artifactId>
             <version>${camel-version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.camel</groupId>-->
-            <!--<artifactId>camel-swagger-java</artifactId>-->
-            <!--<version>${camel-version}</version>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<artifactId>jsr311-api</artifactId>-->
-                    <!--<groupId>javax.ws.rs</groupId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>org.apache.camel</groupId>-->
-            <!--<artifactId>camel-hazelcast</artifactId>-->
-            <!--<version>${camel-version}</version>-->
-        <!--</dependency>-->
-        <!-- Due to maven artifact cache, this dependency needs to be explicit -->
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
             <version>2.6.1</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.entur.helpers</groupId>-->
-            <!--<artifactId>hazelcast-helper</artifactId>-->
-            <!--<version>${entur.helpers.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.entur.helpers</groupId>
             <artifactId>organisation</artifactId>
             <version>${entur.helpers.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.entur.helpers</groupId>-->
-            <!--<artifactId>jms-batch</artifactId>-->
-            <!--<version>${entur.helpers.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.camel</groupId>-->
-            <!--<artifactId>camel-sql</artifactId>-->
-            <!--<version>${camel-version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
@@ -279,107 +181,53 @@
             <artifactId>httpclient</artifactId>
             <version>${httpcomponents.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <!--<dependency>-->
             <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-web</artifactId>-->
-        <!--</dependency>-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jersey</artifactId>
-        </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-jdbc</artifactId>-->
+            <!--<artifactId>spring-boot-starter-jersey</artifactId>-->
         <!--</dependency>-->
 
-        <!-- http://mvnrepository.com/artifact/org.apache.camel/camel-spring-javaconfig -->
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-spring-javaconfig</artifactId>
             <version>${camel-version}</version>
             <scope>test</scope>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>org.hibernate</groupId>-->
-            <!--<artifactId>hibernate-validator</artifactId>-->
-            <!--<version>5.2.3.Final</version>-->
-        <!--</dependency>-->
-
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>netex-java-model</artifactId>
             <version>${netex-java-model.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>1.14</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>1.3.2</version>
         </dependency>
-
-
-        <!--<dependency>-->
-            <!--<groupId>org.apache.tomcat</groupId>-->
-            <!--<artifactId>el-api</artifactId>-->
-            <!--<version>6.0.53</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>com.github.junrar</groupId>-->
-            <!--<artifactId>junrar</artifactId>-->
-            <!--<version>0.7</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>crosby.binary</groupId>-->
-            <!--<artifactId>osmpbf</artifactId>-->
-            <!--<version>1.3.4</version>-->
-            <!--<classifier>20150914.191218-1</classifier>-->
-            <!--&lt;!&ndash; Specifying snapshot &ndash;&gt;-->
-        <!--</dependency>-->
-        <!-- testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test-spring</artifactId>
             <version>${camel-version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test</artifactId>
             <version>${camel-version}</version>
             <scope>test</scope>
         </dependency>
-
-
-        <!-- <dependency> <groupId>org.jboss.arquillian.junit</groupId> <artifactId>arquillian-junit-container</artifactId> <scope>test</scope>
-            </dependency> -->
-
-        <!--<dependency>-->
-            <!--<groupId>io.fabric8</groupId>-->
-            <!--<artifactId>fabric8-arquillian</artifactId>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>net.javacrumbs.json-unit</groupId>
             <artifactId>json-unit</artifactId>
@@ -398,39 +246,12 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.hamcrest</groupId>-->
-            <!--<artifactId>hamcrest-junit</artifactId>-->
-            <!--<version>2.0.0.0</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.mockftpserver</groupId>-->
-            <!--<artifactId>MockFtpServer</artifactId>-->
-            <!--<version>2.6</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-contract-wiremock</artifactId>
             <version>1.2.2.RELEASE</version>
             <scope>test</scope>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>no.jskdata</groupId>-->
-            <!--<artifactId>jskdata</artifactId>-->
-            <!--<version>1.0.8</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>no.vegvesen.nvdb</groupId>-->
-            <!--<artifactId>sosi-reader-impl</artifactId>-->
-            <!--<version>1.18</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.wololo</groupId>-->
-            <!--<artifactId>jts2geojson</artifactId>-->
-            <!--<version>0.10.0</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
