@@ -86,12 +86,12 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
     @Before
     public void before() throws Exception {
 
-        System.out.println("Wirremock port is: " + +wiremockServerPort);
+        System.out.println("Wiremock port is: " + +wiremockServerPort);
         replaceEndpoint("mapbox-convert-upload-tiamat-data", "direct:uploadMapboxDataAws", "mock:uploadMapboxDataAws");
 
         when(blobStoreService
                 .getBlob(blobStoreSubdirectoryForTiamatGeoCoderExport + "/" + TIAMAT_EXPORT_LATEST_FILE_NAME))
-                .thenReturn(new FileInputStream(new File("src/test/resources/stops.zip")));
+                .thenReturn(new FileInputStream(new File(getClass().getResource("/stops.zip").getFile())));
         context.start();
     }
 
