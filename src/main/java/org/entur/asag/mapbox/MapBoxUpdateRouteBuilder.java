@@ -70,16 +70,8 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
 
     @Override
     public void configure() throws Exception {
-//        super.configure();
 
         final String tilesetName = mapboxUser + ".automated-uploaded-tileset" + (Strings.isNullOrEmpty(projectId) ? "" : "-" + projectId);
-
-//        singletonFrom("quartz2://marduk/mapboxUpdate?cron=" + cronSchedule + "&trigger.timeZone=Europe/Oslo")
-//                .autoStartup("{{mapbox.update.autoStartup:false}}")
-//                .filter(e -> isLeader(e.getFromRouteId()))
-//                .log(LoggingLevel.INFO, "Update mapbox tileset from tiamat export started by cron")
-//                .to("direct:uploadTiamatToMapboxAsGeoJson")
-//                .routeId("mapbox-update-quartz");
 
         from("direct:uploadTiamatToMapboxAsGeoJson")
                 .setHeader(TIAMAT_EXPORT_GCP_PATH, simple(blobStoreSubdirectoryForTiamatGeoCoderExport + "/" + TIAMAT_EXPORT_LATEST_FILE_NAME))
@@ -164,7 +156,6 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
 
         from("direct:retrieveMapboxAwsCredentials")
                 .log(LoggingLevel.INFO, "About to retrieve credentials for aws from mapbox. User: "+ mapboxUser)
-                .setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
                 .to(mapboxApiUrl + "/uploads/v1/" + mapboxUser + "/credentials?access_token=" + mapboxAccessToken)
                 .unmarshal().json(JsonLibrary.Jackson, MapBoxAwsCredentials.class)
                 .setHeader("credentials", simple("${body}"))

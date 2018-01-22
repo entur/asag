@@ -67,8 +67,13 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
     @Autowired
     private BlobStoreService blobStoreService;
 
+    @Value("${wiremock.server.port}")
+    private int wiremockServerPort;
+
     @Before
     public void before() throws Exception {
+
+        System.out.println("Wirremock port is: " + +wiremockServerPort);
         replaceEndpoint("mapbox-convert-upload-tiamat-data", "direct:uploadMapboxDataAws", "mock:uploadMapboxDataAws");
 //        inMemoryBlobStoreRepository.uploadBlob(blobStoreSubdirectoryForTiamatGeoCoderExport + "/" + TIAMAT_EXPORT_LATEST_FILE_NAME,
 //                new FileInputStream(new File("src/test/resources/no/rutebanken/marduk/routes/netex/stops.zip")), false);
@@ -145,7 +150,7 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
     }
 
     private void stubCredentials() {
-        stubFor(post(urlPathMatching(RETRIEVE_CREDENTIALS_PATH_PATTERN))
+        stubFor(get(urlPathMatching(RETRIEVE_CREDENTIALS_PATH_PATTERN))
                 .willReturn(
                         aResponse()
                                 .withHeader("Content-Type", "application/json")
