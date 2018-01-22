@@ -15,22 +15,40 @@
 
 package org.entur.asag;
 
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.spring.boot.CamelSpringBootApplicationController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
 public class AsagApp extends RouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(AsagApp.class);
 
-    public static void main(String... args) {
+    @Produce(uri = "direct:uploadTiamatToMapboxAsGeoJson")
+    ProducerTemplate producerTemplate;
+
+    public static void main(String... args) throws Exception {
         logger.info("Starting Asag ...");
-        SpringApplication app = new SpringApplication(AsagApp.class);
-        app.setWebEnvironment(false);
-        app.run(args);
+
+        SpringApplication springApplication = new SpringApplication(AsagApp.class);
+        springApplication.setWebEnvironment(false);
+        ApplicationContext applicationContext = springApplication.run(args);
+
+        CamelSpringBootApplicationController applicationController = applicationContext.getBean(CamelSpringBootApplicationController.class);
+
+        AsagApp asagApp = applicationContext.getBean(AsagApp.class);
+        asagApp.run();
+
+    }
+
+    private void run() {
+        producerTemplate.request("direct:uploadTiamatToMapboxAsGeoJson", System.out::println);
     }
 
     @Override
