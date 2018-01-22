@@ -107,11 +107,11 @@ public class DeliveryPublicationStreamToGeoJson {
 
         stops.incrementAndGet();
 
-        log(stops, StopPlace.class.getSimpleName());
+        logEveryN(1000, stops, StopPlace.class.getSimpleName());
     }
 
-    private void log(AtomicInteger counter, String type) {
-        if (counter.get() % 200 == 0) {
+    private void logEveryN(int n, AtomicInteger counter, String type) {
+        if (counter.get() % n == 0) {
             logger.info("Transformed {} {}", counter.get(), type);
         }
     }
