@@ -50,9 +50,6 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
     public static final String STATE_ERROR = "error";
     public static final String STATE_TIMEOUT = "timeout";
 
-    @Value("${mapbox.update.cron.schedule:0+59+*+?+*+SUN-SAT}")
-    private String cronSchedule;
-
     /**
      * Use the same tiamat data as the geocoder
      */
@@ -86,7 +83,11 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
     @Override
     public void configure() throws Exception {
 
-        final String tilesetName = mapboxUser + ".automated-uploaded-tileset" + (Strings.isNullOrEmpty(projectId) ? "" : "-" + projectId);
+        /**
+         * 	the map ID to create or replace in the format  username.nameoftileset - limited to 32 characters
+         * 	(only  - and  _ special characters allowed, limit does not include username)
+         */
+        final String tilesetName = mapboxUser + "." + (Strings.isNullOrEmpty(projectId) ? "tileset" : "-" + projectId);
 
         from("direct:uploadTiamatToMapboxAsGeoJson")
                 .setHeader(TIAMAT_EXPORT_GCP_PATH, simple(blobStoreSubdirectoryForTiamatGeoCoderExport + "/" + TIAMAT_EXPORT_LATEST_FILE_NAME))
@@ -101,7 +102,6 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
                 .to("direct:initiateMapboxUpload")
                 .delay(mapboxUploadPollDelay)
                 .to("direct:pollRetryMapboxStatus")
-                .to("direct:recreateLocalMapboxDirectory")
                 .routeId("mapbox-convert-upload-tiamat-data");
 
         from("direct:initiateMapboxUpload")
@@ -112,7 +112,9 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
                 .marshal().json(JsonLibrary.Jackson)
                 .log(LoggingLevel.INFO, "Upload: ${body}")
                 .setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
-                .to(mapboxApiUrl + "/uploads/v1/" + mapboxUser + "?access_token=" + mapboxAccessToken)
+                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+                .to(mapboxApiUrl + "/uploads/v1/" + mapboxUser + "?access_token=" + mapboxAccessToken + "&throwExceptionOnFailure=false")
+                .to("log:DEBUG?showBody=true&showHeaders=true")
                 .unmarshal().json(JsonLibrary.Jackson, MapBoxUploadStatus.class)
                 .log(LoggingLevel.INFO, "Received ${body}")
                 .routeId("initiate-mapbox-upload");
