@@ -18,30 +18,18 @@ package org.entur.asag.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class ZipFileUtils {
     private static Logger logger = LoggerFactory.getLogger(ZipFileUtils.class);
-
-    public Set<String> listFilesInZip(File file) {
-        try (ZipFile zipFile = new ZipFile(file)) {
-            return zipFile.stream().filter(ze -> !ze.isDirectory()).map(ze -> ze.getName()).collect(Collectors.toSet());
-        } catch (IOException e) {
-            return Collections.emptySet();
-        }
-    }
-
-    public Set<String> listFilesInZip(byte[] data) {
-        return listFilesInZip(new ByteArrayInputStream(data));
-    }
 
     public Set<String> listFilesInZip(InputStream inputStream) {
         Set<String> fileNames = new HashSet<>();
@@ -57,9 +45,6 @@ public class ZipFileUtils {
             return Collections.emptySet();
         }
     }
-
-
-
 
 
     public static void unzipFile(InputStream inputStream, String targetFolder) {
@@ -97,45 +82,4 @@ public class ZipFileUtils {
             throw new RuntimeException("Unzipping archive failed: " + ioE.getMessage(), ioE);
         }
     }
-
-
-    private static File getFile(byte[] data) throws IOException {
-        File inputFile = File.createTempFile("marduk-input", ".zip");
-
-        FileOutputStream fos = new FileOutputStream(inputFile);
-        fos.write(data);
-        fos.close();
-        return inputFile;
-    }
-
-    private static ZipFile getZipFileIfSingleFolder(File inputFile) throws IOException {
-
-        if (inputFile == null || inputFile.length() == 0) {
-            return null;
-        }
-
-        ZipFile zipFile = new ZipFile(inputFile);
-        boolean allFilesInSingleDirectory = false;
-        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-        String directoryName = "";
-        while (entries.hasMoreElements()) {
-            ZipEntry zipEntry = entries.nextElement();
-            if (zipEntry.isDirectory()) {
-                allFilesInSingleDirectory = true;
-                directoryName = zipEntry.getName();
-            } else {
-                if (!zipEntry.getName().startsWith(directoryName)) {
-                    allFilesInSingleDirectory = false;
-                    break;
-                }
-            }
-        }
-
-        if (allFilesInSingleDirectory) {
-            return zipFile;
-        }
-        return null;
-    }
-
-
 }

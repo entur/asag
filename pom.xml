@@ -234,6 +234,11 @@
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.9.39</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jackson</artifactId>
+            <version>${camel-version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -328,9 +333,6 @@
         </pluginManagement>
     </build>
 
-    <!-- Default sample commands: mvn -Pf8-build ... build Docker images and create OpenShift deployment configs mvn -Pf8-deploy
-        ... f8-build + push to Docker registry + applying deployment config to OpenShift mvn -Pf8-local-deploy ... deployment for
-        a single node setup without pushing to a registry For individual goal usage please consult the fabric8 documentation -->
     <profiles>
         <profile>
             <id>entur</id>
