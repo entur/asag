@@ -46,7 +46,7 @@ public class BlobStoreService {
     }
 
     public InputStream getBlob(@Header(value = FILE_HANDLE) String name) {
-        logger.info("Getting blob: {} from container {}, storage {}", name, containerName, storage);
+        logger.info("Getting blob: {} from container {}", name, containerName);
         return BlobStoreHelper.getBlob(storage, containerName, name);
     }
 }
