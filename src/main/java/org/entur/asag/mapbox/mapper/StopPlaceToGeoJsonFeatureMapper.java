@@ -16,14 +16,38 @@
 package org.entur.asag.mapbox.mapper;
 
 import org.geojson.Feature;
+import org.rutebanken.netex.model.DataManagedObjectStructure;
+import org.rutebanken.netex.model.KeyValueStructure;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.StopPlace_VersionStructure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.entur.asag.mapbox.mapper.KeyValuesHelper.getValueByKey;
+
+/**
+ * Mapping of netex stop place to geojson.
+ * NOTE THAT: General mapping for Zone is not done here.
+ */
 @Service
 public class StopPlaceToGeoJsonFeatureMapper {
 
+    private static final Logger logger = LoggerFactory.getLogger(StopPlaceToGeoJsonFeatureMapper.class);
+
+    protected static final String IS_PARENT_STOP_PLACE = "IS_PARENT_STOP_PLACE";
+
     private final ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper;
+
 
     @Autowired
     public StopPlaceToGeoJsonFeatureMapper(ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper) {
@@ -32,7 +56,43 @@ public class StopPlaceToGeoJsonFeatureMapper {
 
     public Feature mapStopPlaceToGeoJson(StopPlace stopPlace) {
         Feature feature = zoneToGeoJsonFeatureMapper.mapZoneToGeoJson(stopPlace);
+
+        if (stopPlace.getStopPlaceType() != null) {
+            feature.setProperty("stopPlaceType", stopPlace.getStopPlaceType().value());
+        }
+
+        String submode = resolveFirstSubmodeToSingleValue(stopPlace);
+        feature.setProperty("submode", submode);
+
+
+        if (stopPlace.getWeighting() != null) {
+            feature.setProperty("weighting", stopPlace.getWeighting().value());
+        }
+        feature.setProperty("hasParentSiteRef", stopPlace.getParentSiteRef() != null);
+
+        getValueByKey(stopPlace, IS_PARENT_STOP_PLACE).ifPresent(isParent -> feature.setProperty("isParentStopPlace", Boolean.valueOf(isParent)));
+
         return feature;
 
     }
+
+    private String resolveFirstSubmodeToSingleValue(StopPlace stopPlace) {
+        return Arrays.stream(StopPlace_VersionStructure.class.getDeclaredMethods())
+                .filter(method -> method.getName().startsWith("get") && method.getName().endsWith("Submode"))
+                .map(method -> safeInvoke(method, stopPlace))
+                .filter(Objects::nonNull)
+                .map(String::valueOf)
+                .findAny().orElse(null);
+    }
+
+    private Object safeInvoke(Method method, StopPlace stopPlace) {
+        try {
+            return method.invoke(stopPlace);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            logger.warn("Error resolving submode from stop place {}. Ignoring this method: {}", stopPlace.getId(), method.getName(), e);
+        }
+        return null;
+    }
+
+
 }

@@ -17,14 +17,10 @@ package org.entur.asag.mapbox.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.entur.asag.mapbox.mapper.ZoneToGeoJsonFeatureMapper;
 import org.geojson.Feature;
 import org.geojson.Point;
 import org.junit.Test;
-import org.rutebanken.netex.model.LocationStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.SimplePoint_VersionStructure;
-import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.*;
 
 import java.math.BigDecimal;
 
@@ -43,10 +39,12 @@ public class ZoneToGeoJsonFeatureMapperTest {
         StopPlace stopPlace = new StopPlace()
                 .withId("NSR:StopPlace:1")
                 .withName(new MultilingualString().withValue(stopPlaceName))
+                .withDescription(new MultilingualString()
+                        .withValue("description")
+                        .withLang("nor"))
                 .withCentroid(new SimplePoint_VersionStructure()
                         .withLocation(new LocationStructure()
-                                .withLatitude(BigDecimal.valueOf(latitude))
-                                .withLongitude(BigDecimal.valueOf(longitude))));
+                                .withLatitude(BigDecimal.valueOf(latitude)).withLongitude(BigDecimal.valueOf(longitude))));
 
 
         Feature feature = new ZoneToGeoJsonFeatureMapper().mapZoneToGeoJson(stopPlace);
@@ -59,6 +57,12 @@ public class ZoneToGeoJsonFeatureMapperTest {
 
         String name = (String) feature.getProperties().get("name");
         assertThat(name).as("stopPlaceName").isEqualTo(stopPlaceName);
+
+        String description = (String) feature.getProperties().get("description");
+        assertThat(description).isEqualTo("description");
+
+        String descriptionLang = (String) feature.getProperties().get("description-lang");
+        assertThat(descriptionLang).isEqualTo("nor");
 
         Point point = (Point) feature.getGeometry();
 

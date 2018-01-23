@@ -18,19 +18,24 @@ package org.entur.asag.mapbox.mapper;
 import org.geojson.Feature;
 import org.geojson.LngLatAlt;
 import org.geojson.Point;
+import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Zone_VersionStructure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ZoneToGeoJsonFeatureMapper {
 
+    private static final Logger logger = LoggerFactory.getLogger(ZoneToGeoJsonFeatureMapper.class);
+
     public Feature mapZoneToGeoJson(Zone_VersionStructure zone) {
 
         Feature feature = new Feature();
         feature.setId(zone.getId());
-        if(zone.getName() != null) {
-            feature.setProperty("name", zone.getName().getValue());
-        }
+
+        mapMultilingualString("name", feature, zone.getName());
+        mapMultilingualString("description", feature, zone.getDescription());
 
         if (zone.getCentroid() != null && zone.getCentroid().getLocation() != null) {
             double latitude = zone.getCentroid().getLocation().getLatitude().doubleValue();
@@ -40,10 +45,20 @@ public class ZoneToGeoJsonFeatureMapper {
             Point multiPoint = new Point(lngLatAlt);
             feature.setGeometry(multiPoint);
         } else {
-            throw new IllegalArgumentException("Cannot find centroid for Zone with ID: " + zone.getId());
+            logger.warn("Cannot find centroid for Zone with ID: " + zone.getId());
         }
 
         return feature;
 
+    }
+
+
+    public void mapMultilingualString(String property, Feature feature, MultilingualString multilingualString) {
+        if (multilingualString != null) {
+            feature.setProperty(property, multilingualString.getValue());
+            if (multilingualString.getLang() != null) {
+                feature.setProperty(property + "-lang", multilingualString.getLang());
+            }
+        }
     }
 }
