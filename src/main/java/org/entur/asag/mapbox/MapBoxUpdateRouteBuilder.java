@@ -39,7 +39,6 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
 
     private static final String TIAMAT_EXPORT_GCP_PATH = "tiamat-export";
-    private static final String TIAMAT_GEOSJON_FILENAME = "tiamat.geojson";
     public static final String LOOP_COUNTER = "LoopCounter";
     public static final String FILE_HANDLE = "FileHandle";
 
@@ -88,6 +87,7 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
          * 	(only  - and  _ special characters allowed, limit does not include username)
          */
         final String tilesetName = mapboxUser + "." + (Strings.isNullOrEmpty(projectId) ? "tileset" : projectId);
+        final String geojsonFilename = (Strings.isNullOrEmpty(projectId) ? mapboxUser : projectId) + ".geojson";
 
         from("direct:uploadTiamatToMapboxAsGeoJson")
                 .setHeader(TIAMAT_EXPORT_GCP_PATH, simple(blobStoreSubdirectoryForTiamatGeoCoderExport + "/" + TIAMAT_EXPORT_LATEST_FILE_NAME))
@@ -97,7 +97,7 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
                 .to("direct:retrieveMapboxAwsCredentials")
                 .to("direct:findFirstXmlFileRecursive")
                 .to("direct:transformToGeoJsonFromTiamat")
-                .setHeader(FILE_NAME, constant(TIAMAT_GEOSJON_FILENAME))
+                .setHeader(FILE_NAME, constant(geojsonFilename))
                 .to("direct:uploadMapboxDataAws")
                 .to("direct:initiateMapboxUpload")
                 .delay(mapboxUploadPollDelay)
