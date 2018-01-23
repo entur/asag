@@ -49,7 +49,7 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
         Map<String, Object> properties = feature.getProperties();
 
         assertThat(properties.get("stopPlaceType")).isEqualTo(stopPlace.getStopPlaceType().value());
-        assertThat(properties.get("submode")).isEqualTo(stopPlace.getAirSubmode().toString());
+        assertThat(properties.get("submode")).isEqualTo(stopPlace.getAirSubmode().value());
         assertThat(properties.get("hasParentSiteRef")).isEqualTo(true);
         assertThat(properties.get("isParentStopPlace")).isEqualTo(true);
 

@@ -61,7 +61,7 @@ public class ZoneToGeoJsonFeatureMapperTest {
         String description = (String) feature.getProperties().get("description");
         assertThat(description).isEqualTo("description");
 
-        String descriptionLang = (String) feature.getProperties().get("description-lang");
+        String descriptionLang = (String) feature.getProperties().get("descriptionLang");
         assertThat(descriptionLang).isEqualTo("nor");
 
         Point point = (Point) feature.getGeometry();

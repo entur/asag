@@ -16,8 +16,6 @@
 package org.entur.asag.mapbox.mapper;
 
 import org.geojson.Feature;
-import org.rutebanken.netex.model.DataManagedObjectStructure;
-import org.rutebanken.netex.model.KeyValueStructure;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.StopPlace_VersionStructure;
 import org.slf4j.Logger;
@@ -28,10 +26,8 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.entur.asag.mapbox.mapper.KeyValuesHelper.getValueByKey;
 
@@ -61,9 +57,7 @@ public class StopPlaceToGeoJsonFeatureMapper {
             feature.setProperty("stopPlaceType", stopPlace.getStopPlaceType().value());
         }
 
-        String submode = resolveFirstSubmodeToSingleValue(stopPlace);
-        feature.setProperty("submode", submode);
-
+        resolveFirstSubmodeToSingleValue(stopPlace).ifPresent(submode -> feature.setProperty("submode", submode));
 
         if (stopPlace.getWeighting() != null) {
             feature.setProperty("weighting", stopPlace.getWeighting().value());
@@ -76,13 +70,24 @@ public class StopPlaceToGeoJsonFeatureMapper {
 
     }
 
-    private String resolveFirstSubmodeToSingleValue(StopPlace stopPlace) {
+    private Optional<String> resolveFirstSubmodeToSingleValue(StopPlace stopPlace) {
         return Arrays.stream(StopPlace_VersionStructure.class.getDeclaredMethods())
                 .filter(method -> method.getName().startsWith("get") && method.getName().endsWith("Submode"))
                 .map(method -> safeInvoke(method, stopPlace))
                 .filter(Objects::nonNull)
+                .map(this::getEnumValue)
+                .filter(Objects::nonNull)
                 .map(String::valueOf)
-                .findAny().orElse(null);
+                .findAny();
+    }
+
+    private Object getEnumValue(Object enumObject) {
+        try {
+            return enumObject.getClass().getMethod("value", null).invoke(enumObject);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            logger.warn("Error resolving value from enum {}", enumObject, e);
+        }
+        return null;
     }
 
     private Object safeInvoke(Method method, StopPlace stopPlace) {

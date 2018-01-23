@@ -49,7 +49,6 @@ public class ZoneToGeoJsonFeatureMapper {
         }
 
         return feature;
-
     }
 
 
@@ -57,7 +56,7 @@ public class ZoneToGeoJsonFeatureMapper {
         if (multilingualString != null) {
             feature.setProperty(property, multilingualString.getValue());
             if (multilingualString.getLang() != null) {
-                feature.setProperty(property + "-lang", multilingualString.getLang());
+                feature.setProperty(property + "Lang", multilingualString.getLang());
             }
         }
     }
