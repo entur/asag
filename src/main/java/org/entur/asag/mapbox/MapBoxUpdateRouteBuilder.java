@@ -87,7 +87,7 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
          * 	the map ID to create or replace in the format  username.nameoftileset - limited to 32 characters
          * 	(only  - and  _ special characters allowed, limit does not include username)
          */
-        final String tilesetName = mapboxUser + "." + (Strings.isNullOrEmpty(projectId) ? "tileset" : "-" + projectId);
+        final String tilesetName = mapboxUser + "." + (Strings.isNullOrEmpty(projectId) ? "tileset" : projectId);
 
         from("direct:uploadTiamatToMapboxAsGeoJson")
                 .setHeader(TIAMAT_EXPORT_GCP_PATH, simple(blobStoreSubdirectoryForTiamatGeoCoderExport + "/" + TIAMAT_EXPORT_LATEST_FILE_NAME))
