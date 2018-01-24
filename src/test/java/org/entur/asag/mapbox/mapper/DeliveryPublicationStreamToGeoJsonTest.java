@@ -56,21 +56,30 @@ public class DeliveryPublicationStreamToGeoJsonTest {
         assertThat(featureCollection.getFeatures())
                 .isNotEmpty()
                 .extracting(Feature::getId)
-                    .containsExactly("NSR:StopPlace:1", "NSR:StopPlace:10");
+                .containsExactly("NSR:StopPlace:1", "NSR:StopPlace:10");
 
         assertThat(featureCollection.getFeatures())
                 .extracting(Feature::getGeometry).doesNotContainNull();
 
-        List<String> names = featureCollection.getFeatures()
+        assertThat(resolvePropertiesByValue(featureCollection, "name"))
+                .contains("Drangedal stasjon", "Paradis");
+
+
+        assertThat(resolvePropertiesByValue(featureCollection, "entityType"))
+                .contains("StopPlace", "StopPlace");
+
+        assertThat(resolvePropertiesByValue(featureCollection, "finalStopPlaceType"))
+                .contains("onstreetBus", "railStation");
+    }
+
+    private List<String> resolvePropertiesByValue(FeatureCollection featureCollection, String key) {
+        return featureCollection.getFeatures()
                 .stream()
                 .map(Feature::getProperties)
                 .flatMap(properties -> properties.entrySet().stream())
-                .filter(entrySet -> entrySet.getKey().equals("name"))
+                .filter(entrySet -> entrySet.getKey().equals(key))
                 .map(Map.Entry::getValue)
                 .map(object -> (String) object)
                 .collect(toList());
-        assertThat(names)
-                .contains("Drangedal stasjon", "Paradis");
-
     }
 }

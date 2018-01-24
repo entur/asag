@@ -37,6 +37,8 @@ public class ZoneToGeoJsonFeatureMapper {
         mapMultilingualString("name", feature, zone.getName());
         mapMultilingualString("description", feature, zone.getDescription());
 
+        feature.setProperty("entityType", zone.getClass().getSimpleName());
+
         if (zone.getCentroid() != null && zone.getCentroid().getLocation() != null) {
             double latitude = zone.getCentroid().getLocation().getLatitude().doubleValue();
             double longitude = zone.getCentroid().getLocation().getLongitude().doubleValue();

@@ -22,6 +22,7 @@ import org.rutebanken.netex.model.*;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.FINAL_STOP_PLACE_TYPE;
 import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.IS_PARENT_STOP_PLACE;
 
 public class StopPlaceToGeoJsonFeatureMapperTest {
@@ -50,9 +51,26 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
 
         assertThat(properties.get("stopPlaceType")).isEqualTo(stopPlace.getStopPlaceType().value());
         assertThat(properties.get("submode")).isEqualTo(stopPlace.getAirSubmode().value());
+        assertThat(properties.get("finalStopPlaceType")).isEqualTo(stopPlace.getAirSubmode().value());
         assertThat(properties.get("hasParentSiteRef")).isEqualTo("true");
         assertThat(properties.get("isParentStopPlace")).isEqualTo("true");
 
+    }
+
+    @Test
+    public void testMappingStopPlaceWithoutSubmodeToGeojson() {
+
+        StopPlace stopPlace = new StopPlace()
+                .withId("NSR:StopPlace:1")
+                .withStopPlaceType(StopTypeEnumeration.BUS_STATION);
+
+        StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper = new StopPlaceToGeoJsonFeatureMapper(new ZoneToGeoJsonFeatureMapper());
+
+        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
+
+        Map<String, Object> properties = feature.getProperties();
+
+        assertThat(properties.get(FINAL_STOP_PLACE_TYPE)).isEqualTo(stopPlace.getStopPlaceType().value());
     }
 
 }
