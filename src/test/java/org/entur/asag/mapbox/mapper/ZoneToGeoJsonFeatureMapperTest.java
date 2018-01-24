@@ -25,9 +25,13 @@ import org.rutebanken.netex.model.*;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.entur.asag.mapbox.mapper.ZoneToGeoJsonFeatureMapper.DESCRIPTION;
+import static org.entur.asag.mapbox.mapper.ZoneToGeoJsonFeatureMapper.LANG;
+import static org.entur.asag.mapbox.mapper.ZoneToGeoJsonFeatureMapper.NAME;
 
 
 public class ZoneToGeoJsonFeatureMapperTest {
+
 
     @Test
     public void testMapZoneToFeature() throws JsonProcessingException {
@@ -55,13 +59,13 @@ public class ZoneToGeoJsonFeatureMapperTest {
         assertThat(feature.getGeometry()).isNotNull();
         assertThat(feature.getGeometry()).isInstanceOf(Point.class);
 
-        String name = (String) feature.getProperties().get("name");
+        String name = (String) feature.getProperties().get(NAME);
         assertThat(name).as("stopPlaceName").isEqualTo(stopPlaceName);
 
-        String description = (String) feature.getProperties().get("description");
+        String description = (String) feature.getProperties().get(DESCRIPTION);
         assertThat(description).isEqualTo("description");
 
-        String descriptionLang = (String) feature.getProperties().get("descriptionLang");
+        String descriptionLang = (String) feature.getProperties().get(DESCRIPTION+LANG);
         assertThat(descriptionLang).isEqualTo("nor");
 
         Point point = (Point) feature.getGeometry();

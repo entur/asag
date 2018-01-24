@@ -28,16 +28,20 @@ import org.springframework.stereotype.Service;
 public class ZoneToGeoJsonFeatureMapper {
 
     private static final Logger logger = LoggerFactory.getLogger(ZoneToGeoJsonFeatureMapper.class);
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String ENTITY_TYPE = "entityType";
+    public static final String LANG = "Lang";
 
     public Feature mapZoneToGeoJson(Zone_VersionStructure zone) {
 
         Feature feature = new Feature();
         feature.setId(zone.getId());
 
-        mapMultilingualString("name", feature, zone.getName());
-        mapMultilingualString("description", feature, zone.getDescription());
+        mapMultilingualString(NAME, feature, zone.getName());
+        mapMultilingualString(DESCRIPTION, feature, zone.getDescription());
 
-        feature.setProperty("entityType", zone.getClass().getSimpleName());
+        feature.setProperty(ENTITY_TYPE, zone.getClass().getSimpleName());
 
         if (zone.getCentroid() != null && zone.getCentroid().getLocation() != null) {
             double latitude = zone.getCentroid().getLocation().getLatitude().doubleValue();
@@ -58,7 +62,7 @@ public class ZoneToGeoJsonFeatureMapper {
         if (multilingualString != null) {
             feature.setProperty(property, multilingualString.getValue());
             if (multilingualString.getLang() != null) {
-                feature.setProperty(property + "Lang", multilingualString.getLang());
+                feature.setProperty(property + LANG, multilingualString.getLang());
             }
         }
     }

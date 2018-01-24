@@ -40,13 +40,13 @@ public class StopPlaceToGeoJsonFeatureMapper {
 
     private static final Logger logger = LoggerFactory.getLogger(StopPlaceToGeoJsonFeatureMapper.class);
 
-    protected static final String IS_PARENT_STOP_PLACE = "IS_PARENT_STOP_PLACE";
-    public static final String FINAL_STOP_PLACE_TYPE = "finalStopPlaceType";
-    public static final String SUBMODE = "submode";
-    public static final String STOP_PLACE_TYPE = "stopPlaceType";
-    public static final String WEIGHTING = "weighting";
-    public static final String HAS_PARENT_SITE_REF = "hasParentSiteRef";
-    public static final String IS_PARENT_STOP_PLACE1 = "isParentStopPlace";
+    static final String NETEX_IS_PARENT_STOP_PLACE = "IS_PARENT_STOP_PLACE";
+    static final String FINAL_STOP_PLACE_TYPE = "finalStopPlaceType";
+    static final String SUBMODE = "submode";
+    static final String STOP_PLACE_TYPE = "stopPlaceType";
+    static final String WEIGHTING = "weighting";
+    static final String HAS_PARENT_SITE_REF = "hasParentSiteRef";
+    static final String IS_PARENT_STOP_PLACE = "isParentStopPlace";
 
 
     private final ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper;
@@ -78,7 +78,7 @@ public class StopPlaceToGeoJsonFeatureMapper {
         }
         feature.setProperty(HAS_PARENT_SITE_REF, String.valueOf(stopPlace.getParentSiteRef() != null));
 
-        getValueByKey(stopPlace, IS_PARENT_STOP_PLACE).ifPresent(isParent -> feature.setProperty(IS_PARENT_STOP_PLACE1, isParent));
+        getValueByKey(stopPlace, NETEX_IS_PARENT_STOP_PLACE).ifPresent(isParent -> feature.setProperty(IS_PARENT_STOP_PLACE, isParent));
 
         return feature;
 

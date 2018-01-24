@@ -22,8 +22,7 @@ import org.rutebanken.netex.model.*;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.FINAL_STOP_PLACE_TYPE;
-import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.IS_PARENT_STOP_PLACE;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.*;
 
 public class StopPlaceToGeoJsonFeatureMapperTest {
 
@@ -37,7 +36,7 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
                 .withWeighting(InterchangeWeightingEnumeration.PREFERRED_INTERCHANGE)
                 .withKeyList(new KeyListStructure()
                     .withKeyValue(new KeyValueStructure()
-                            .withKey(IS_PARENT_STOP_PLACE)
+                            .withKey(NETEX_IS_PARENT_STOP_PLACE)
                             .withValue("true")))
                 .withParentSiteRef(new SiteRefStructure()
                         .withRef("NSR:StopPlace:2")
@@ -49,11 +48,12 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
 
         Map<String, Object> properties = feature.getProperties();
 
-        assertThat(properties.get("stopPlaceType")).isEqualTo(stopPlace.getStopPlaceType().value());
-        assertThat(properties.get("submode")).isEqualTo(stopPlace.getAirSubmode().value());
-        assertThat(properties.get("finalStopPlaceType")).isEqualTo(stopPlace.getAirSubmode().value());
-        assertThat(properties.get("hasParentSiteRef")).isEqualTo("true");
-        assertThat(properties.get("isParentStopPlace")).isEqualTo("true");
+        assertThat(properties.get(STOP_PLACE_TYPE)).isEqualTo(stopPlace.getStopPlaceType().value());
+        assertThat(properties.get(SUBMODE)).isEqualTo(stopPlace.getAirSubmode().value());
+        assertThat(properties.get(FINAL_STOP_PLACE_TYPE)).isEqualTo(stopPlace.getAirSubmode().value());
+        assertThat(properties.get(HAS_PARENT_SITE_REF)).isEqualTo("true");
+        assertThat(properties.get(IS_PARENT_STOP_PLACE)).isEqualTo("true");
+        assertThat(properties.get(WEIGHTING)).isEqualTo(stopPlace.getWeighting().value());
 
     }
 
