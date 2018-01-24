@@ -13,9 +13,11 @@
  * limitations under the Licence.
  */
 
-package org.entur.asag.mapbox.mapper;
+package org.entur.asag.mapbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.entur.asag.mapbox.filter.ValidityFilter;
+import org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper;
 import org.entur.asag.netex.PublicationDeliveryHelper;
 import org.geojson.Feature;
 import org.rutebanken.netex.model.StopPlace;
@@ -38,26 +40,35 @@ public class DeliveryPublicationStreamToGeoJson {
 
     private static final Logger logger = LoggerFactory.getLogger(DeliveryPublicationStreamToGeoJson.class);
 
-    private static final String STOP_PLACE_LOCAL_NAME = "StopPlace";
-
     private final StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper;
 
+    private final ValidityFilter validityFilter;
+
+    private ObjectMapper jacksonObjectMapper = new ObjectMapper();
+
+    private final Unmarshaller unmarshaller;
+
     @Autowired
-    public DeliveryPublicationStreamToGeoJson(StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper) {
+    public DeliveryPublicationStreamToGeoJson(StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper, ValidityFilter validityFilter) throws JAXBException {
         this.stopPlaceToGeoJsonFeatureMapper = stopPlaceToGeoJsonFeatureMapper;
+        this.validityFilter = validityFilter;
+        unmarshaller = PublicationDeliveryHelper.createUnmarshaller();
     }
 
-
     public OutputStream transform(InputStream publicationDeliveryStream) {
-        AtomicInteger stops = new AtomicInteger();
-        ObjectMapper jacksonObjectMapper = new ObjectMapper();
+        return traverse(publicationDeliveryStream);
+    }
+
+    private OutputStream traverse(InputStream publicationDeliveryStream) {
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
 
-        boolean firstWritten = false;
+        AtomicInteger stopsCounter = new AtomicInteger();
+
+        boolean lastWasMapped = false;
         try {
             writeFeatureCollectionStart(outputStreamWriter);
-            Unmarshaller unmarshaller = PublicationDeliveryHelper.createUnmarshaller();
 
             XMLEventReader xmlEventReader = XMLInputFactory.newInstance().createXMLEventReader(publicationDeliveryStream);
 
@@ -67,25 +78,36 @@ public class DeliveryPublicationStreamToGeoJson {
                 if (xmlEvent.isStartElement()) {
                     StartElement startElement = xmlEvent.asStartElement();
                     String localPartOfName = startElement.getName().getLocalPart();
-
-                    if (localPartOfName.equals(STOP_PLACE_LOCAL_NAME)) {
-                        if(firstWritten) {
-                            outputStreamWriter.write(",\n");
-                            outputStreamWriter.flush();
-                        } else {
-                            firstWritten = true;
-                        }
-                        handleStopPlace(unmarshaller, xmlEventReader, jacksonObjectMapper, outputStream, stops);
-                    }
+                    lastWasMapped = handleXmlElement(localPartOfName, xmlEventReader, stopsCounter, outputStream, outputStreamWriter, lastWasMapped);
                 }
                 xmlEventReader.next();
             }
+
             writeFeatureCollectionEnd(outputStreamWriter);
 
         } catch (Exception e) {
             throw new RuntimeException("Parsing of DeliveryPublications failed: " + e.getMessage(), e);
         }
         return outputStream;
+    }
+
+    private boolean handleXmlElement(String localPartOfName, XMLEventReader xmlEventReader, AtomicInteger stops, OutputStream outputStream, OutputStreamWriter outputStreamWriter, boolean lastWasMapped) throws JAXBException, IOException {
+        if ("StopPlace".equals(localPartOfName)) {
+            StopPlace stopPlace = unmarshaller.unmarshal(xmlEventReader, StopPlace.class).getValue();
+            if (validityFilter.isValidNow(stopPlace.getValidBetween())) {
+
+                if (lastWasMapped) {
+                    outputStreamWriter.write(",\n");
+                    outputStreamWriter.flush();
+                }
+                Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
+                jacksonObjectMapper.writeValue(outputStream, feature);
+                stops.incrementAndGet();
+                logEveryN(1000, stops, StopPlace.class.getSimpleName());
+                return true;
+            }
+        }
+        return false;
     }
 
     private void writeFeatureCollectionStart(OutputStreamWriter outputStreamWriter) throws IOException {
@@ -96,18 +118,6 @@ public class DeliveryPublicationStreamToGeoJson {
     private void writeFeatureCollectionEnd(OutputStreamWriter outputStreamWriter) throws IOException {
         outputStreamWriter.write("\n], \"type\": \"FeatureCollection\"\n}");
         outputStreamWriter.flush();
-    }
-
-    private void handleStopPlace(Unmarshaller unmarshaller, XMLEventReader xmlEventReader, ObjectMapper jacksonObjectMapper, OutputStream outputStream, AtomicInteger stops) throws JAXBException, IOException {
-        StopPlace stopPlace = unmarshaller.unmarshal(xmlEventReader, StopPlace.class).getValue();
-
-        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
-
-        jacksonObjectMapper.writeValue(outputStream, feature);
-
-        stops.incrementAndGet();
-
-        logEveryN(1000, stops, StopPlace.class.getSimpleName());
     }
 
     private void logEveryN(int n, AtomicInteger counter, String type) {

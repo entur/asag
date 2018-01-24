@@ -15,6 +15,7 @@
 
 package org.entur.asag.mapbox.mapper;
 
+import org.entur.asag.mapbox.filter.ValidityFilter;
 import org.geojson.Feature;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.StopPlace_VersionStructure;
@@ -43,7 +44,6 @@ public class StopPlaceToGeoJsonFeatureMapper {
     protected static final String IS_PARENT_STOP_PLACE = "IS_PARENT_STOP_PLACE";
 
     private final ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper;
-
 
     @Autowired
     public StopPlaceToGeoJsonFeatureMapper(ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper) {

@@ -16,13 +16,13 @@
 package org.entur.asag.mapbox.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.entur.asag.mapbox.mapper.DeliveryPublicationStreamToGeoJson;
-import org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper;
-import org.entur.asag.mapbox.mapper.ZoneToGeoJsonFeatureMapper;
+import org.entur.asag.mapbox.DeliveryPublicationStreamToGeoJson;
+import org.entur.asag.mapbox.filter.ValidityFilter;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.junit.Test;
 
+import javax.xml.bind.JAXBException;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.util.List;
@@ -36,7 +36,11 @@ public class DeliveryPublicationStreamToGeoJsonTest {
 
     private ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper = new ZoneToGeoJsonFeatureMapper();
     private StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper = new StopPlaceToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
-    private DeliveryPublicationStreamToGeoJson deliveryPublicationStreamToGeoJson = new DeliveryPublicationStreamToGeoJson(stopPlaceToGeoJsonFeatureMapper);
+    private ValidityFilter validityFilter = new ValidityFilter();
+    private DeliveryPublicationStreamToGeoJson deliveryPublicationStreamToGeoJson = new DeliveryPublicationStreamToGeoJson(stopPlaceToGeoJsonFeatureMapper, validityFilter);
+
+    public DeliveryPublicationStreamToGeoJsonTest() throws JAXBException {
+    }
 
     @Test
     public void transform() throws Exception {
