@@ -62,9 +62,9 @@ public class StopPlaceToGeoJsonFeatureMapper {
         if (stopPlace.getWeighting() != null) {
             feature.setProperty("weighting", stopPlace.getWeighting().value());
         }
-        feature.setProperty("hasParentSiteRef", stopPlace.getParentSiteRef() != null);
+        feature.setProperty("hasParentSiteRef", String.valueOf(stopPlace.getParentSiteRef() != null));
 
-        getValueByKey(stopPlace, IS_PARENT_STOP_PLACE).ifPresent(isParent -> feature.setProperty("isParentStopPlace", Boolean.valueOf(isParent)));
+        getValueByKey(stopPlace, IS_PARENT_STOP_PLACE).ifPresent(isParent -> feature.setProperty("isParentStopPlace", isParent));
 
         return feature;
 

@@ -50,8 +50,8 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
 
         assertThat(properties.get("stopPlaceType")).isEqualTo(stopPlace.getStopPlaceType().value());
         assertThat(properties.get("submode")).isEqualTo(stopPlace.getAirSubmode().value());
-        assertThat(properties.get("hasParentSiteRef")).isEqualTo(true);
-        assertThat(properties.get("isParentStopPlace")).isEqualTo(true);
+        assertThat(properties.get("hasParentSiteRef")).isEqualTo("true");
+        assertThat(properties.get("isParentStopPlace")).isEqualTo("true");
 
     }
 
