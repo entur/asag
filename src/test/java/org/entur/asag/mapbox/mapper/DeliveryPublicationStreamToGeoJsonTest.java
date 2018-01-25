@@ -35,9 +35,10 @@ public class DeliveryPublicationStreamToGeoJsonTest {
 
 
     private ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper = new ZoneToGeoJsonFeatureMapper();
+    private QuayToGeoJsonFeatureMapper quayToGeoJsonFeatureMapper = new QuayToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
     private StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper = new StopPlaceToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
     private ValidityFilter validityFilter = new ValidityFilter();
-    private DeliveryPublicationStreamToGeoJson deliveryPublicationStreamToGeoJson = new DeliveryPublicationStreamToGeoJson(stopPlaceToGeoJsonFeatureMapper, validityFilter);
+    private DeliveryPublicationStreamToGeoJson deliveryPublicationStreamToGeoJson = new DeliveryPublicationStreamToGeoJson(stopPlaceToGeoJsonFeatureMapper, quayToGeoJsonFeatureMapper, validityFilter);
 
     public DeliveryPublicationStreamToGeoJsonTest() throws JAXBException {
     }
@@ -56,7 +57,9 @@ public class DeliveryPublicationStreamToGeoJsonTest {
         assertThat(featureCollection.getFeatures())
                 .isNotEmpty()
                 .extracting(Feature::getId)
-                .containsExactly("NSR:StopPlace:1", "NSR:StopPlace:10");
+                .containsExactly("NSR:StopPlace:1", "NSR:StopPlace:10", "NSR:Quay:8");
+
+        System.out.println(featureCollection);
 
         assertThat(featureCollection.getFeatures())
                 .extracting(Feature::getGeometry).doesNotContainNull();

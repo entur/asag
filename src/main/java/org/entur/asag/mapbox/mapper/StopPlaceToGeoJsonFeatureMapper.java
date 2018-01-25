@@ -48,7 +48,6 @@ public class StopPlaceToGeoJsonFeatureMapper {
     static final String HAS_PARENT_SITE_REF = "hasParentSiteRef";
     static final String IS_PARENT_STOP_PLACE = "isParentStopPlace";
 
-
     private final ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper;
 
     @Autowired

@@ -26,7 +26,8 @@
                 </DefaultLocale>
             </FrameDefaults>
             <stopPlaces>
-                <StopPlace created="2017-06-19T19:12:27.003" changed="2017-08-09T12:11:43.961" modification="new" version="2" id="NSR:StopPlace:1">
+                <StopPlace created="2017-06-19T19:12:27.003" changed="2017-08-09T12:11:43.961" modification="new"
+                           version="2" id="NSR:StopPlace:1">
                     <ValidBetween>
                         <FromDate>2017-08-09T12:11:42</FromDate>
                     </ValidBetween>
@@ -38,19 +39,6 @@
                         </Location>
                     </Centroid>
                     <StopPlaceType>railStation</StopPlaceType>
-                </StopPlace>
-                <StopPlace created="2017-06-19T19:12:31.003" modification="new" version="1" id="NSR:StopPlace:10">
-                    <ValidBetween>
-                        <FromDate>2017-06-19T19:12:31.003</FromDate>
-                    </ValidBetween>
-                    <Name lang="nor">Paradis</Name>
-                    <Centroid>
-                        <Location>
-                            <Longitude>5.741593</Longitude>
-                            <Latitude>58.956267</Latitude>
-                        </Location>
-                    </Centroid>
-                    <StopPlaceType>onstreetBus</StopPlaceType>
                 </StopPlace>
                 <StopPlace created="2017-06-19T19:12:31.003" modification="new" version="1" id="NSR:StopPlace:22">
                     <ValidBetween>
@@ -65,6 +53,52 @@
                         </Location>
                     </Centroid>
                     <StopPlaceType>onstreetBus</StopPlaceType>
+                </StopPlace>
+                <StopPlace created="2017-06-19T19:12:31.003" modification="new" version="1" id="NSR:StopPlace:10">
+                    <ValidBetween>
+                        <FromDate>2017-06-19T19:12:31.003</FromDate>
+                    </ValidBetween>
+                    <Name lang="nor">Paradis</Name>
+                    <Centroid>
+                        <Location>
+                            <Longitude>5.741593</Longitude>
+                            <Latitude>58.956267</Latitude>
+                        </Location>
+                    </Centroid>
+                    <StopPlaceType>onstreetBus</StopPlaceType>
+                    <quays>
+                        <Quay changed="2017-08-09T12:11:43.961" modification="new" version="2" id="NSR:Quay:8">
+                            <keyList>
+                                <KeyValue>
+                                    <Key>grails-platformId</Key>
+                                    <Value>6684</Value>
+                                </KeyValue>
+                                <KeyValue>
+                                    <Key>uicCode</Key>
+                                    <Value>7602103</Value>
+                                </KeyValue>
+                                <KeyValue>
+                                    <Key>imported-id</Key>
+                                    <Value>NSB:Quay:0076021032</Value>
+                                </KeyValue>
+                                <KeyValue>
+                                    <Key>tpsiId</Key>
+                                    <Value>760210302</Value>
+                                </KeyValue>
+                            </keyList>
+                            <Description lang="nor"></Description>
+                            <PrivateCode>2</PrivateCode>
+                            <Centroid>
+                                <Location>
+                                    <Longitude>9.064469</Longitude>
+                                    <Latitude>59.096179</Latitude>
+                                </Location>
+                            </Centroid>
+                            <AccessModes></AccessModes>
+                            <OtherTransportModes></OtherTransportModes>
+                            <PublicCode>2</PublicCode>
+                        </Quay>
+                    </quays>
                 </StopPlace>
             </stopPlaces>
         </SiteFrame>

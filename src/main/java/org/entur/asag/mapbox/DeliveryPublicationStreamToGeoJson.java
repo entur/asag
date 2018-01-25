@@ -17,6 +17,7 @@ package org.entur.asag.mapbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.entur.asag.mapbox.filter.ValidityFilter;
+import org.entur.asag.mapbox.mapper.QuayToGeoJsonFeatureMapper;
 import org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper;
 import org.entur.asag.netex.PublicationDeliveryHelper;
 import org.geojson.Feature;
@@ -42,6 +43,8 @@ public class DeliveryPublicationStreamToGeoJson {
 
     private final StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper;
 
+    private final QuayToGeoJsonFeatureMapper quayToGeoJsonFeatureMapper;
+
     private final ValidityFilter validityFilter;
 
     private ObjectMapper jacksonObjectMapper = new ObjectMapper();
@@ -49,8 +52,9 @@ public class DeliveryPublicationStreamToGeoJson {
     private final Unmarshaller unmarshaller;
 
     @Autowired
-    public DeliveryPublicationStreamToGeoJson(StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper, ValidityFilter validityFilter) throws JAXBException {
+    public DeliveryPublicationStreamToGeoJson(StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper, QuayToGeoJsonFeatureMapper quayToGeoJsonFeatureMapper, ValidityFilter validityFilter) throws JAXBException {
         this.stopPlaceToGeoJsonFeatureMapper = stopPlaceToGeoJsonFeatureMapper;
+        this.quayToGeoJsonFeatureMapper = quayToGeoJsonFeatureMapper;
         this.validityFilter = validityFilter;
         unmarshaller = PublicationDeliveryHelper.createUnmarshaller();
     }
@@ -97,17 +101,27 @@ public class DeliveryPublicationStreamToGeoJson {
             if (validityFilter.isValidNow(stopPlace.getValidBetween())) {
 
                 if (lastWasMapped) {
-                    outputStreamWriter.write(",\n");
-                    outputStreamWriter.flush();
+                    writeComma(outputStreamWriter);
                 }
                 Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
                 jacksonObjectMapper.writeValue(outputStream, feature);
+
+                for(Feature quayFeature : quayToGeoJsonFeatureMapper.mapQuaysToGeojsonFeatures(stopPlace.getQuays())) {
+                    writeComma(outputStreamWriter);
+                    jacksonObjectMapper.writeValue(outputStream, quayFeature);
+                }
+
                 stops.incrementAndGet();
                 logEveryN(1000, stops, StopPlace.class.getSimpleName());
                 return true;
             }
         }
-        return false;
+        return lastWasMapped;
+    }
+
+    private void writeComma(OutputStreamWriter outputStreamWriter) throws IOException {
+        outputStreamWriter.write(",\n");
+        outputStreamWriter.flush();
     }
 
     private void writeFeatureCollectionStart(OutputStreamWriter outputStreamWriter) throws IOException {

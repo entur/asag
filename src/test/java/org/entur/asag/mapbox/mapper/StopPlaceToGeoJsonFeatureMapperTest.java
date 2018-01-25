@@ -26,6 +26,10 @@ import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.*;
 
 public class StopPlaceToGeoJsonFeatureMapperTest {
 
+    private ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper = new ZoneToGeoJsonFeatureMapper();
+
+    private StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper = new StopPlaceToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
+
     @Test
     public void testMappingStopPlaceToGeojson() {
 
@@ -42,7 +46,6 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
                         .withRef("NSR:StopPlace:2")
                         .withVersion("2"));
 
-        StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper = new StopPlaceToGeoJsonFeatureMapper(new ZoneToGeoJsonFeatureMapper());
 
         Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
 
@@ -63,8 +66,6 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
         StopPlace stopPlace = new StopPlace()
                 .withId("NSR:StopPlace:1")
                 .withStopPlaceType(StopTypeEnumeration.BUS_STATION);
-
-        StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper = new StopPlaceToGeoJsonFeatureMapper(new ZoneToGeoJsonFeatureMapper());
 
         Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
 
