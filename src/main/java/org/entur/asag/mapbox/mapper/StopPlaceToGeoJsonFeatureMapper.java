@@ -30,6 +30,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.entur.asag.mapbox.mapper.KeyValuesHelper.getValueByKey;
+import static org.entur.asag.mapbox.mapper.MapperHelper.setIfNotNull;
+import static org.entur.asag.mapbox.mapper.MapperHelper.setResolvedValue;
 
 /**
  * Mapping of netex stop place to geojson.
@@ -38,16 +40,15 @@ import static org.entur.asag.mapbox.mapper.KeyValuesHelper.getValueByKey;
 @Service
 public class StopPlaceToGeoJsonFeatureMapper {
 
-    private static final Logger logger = LoggerFactory.getLogger(StopPlaceToGeoJsonFeatureMapper.class);
-
     static final String NETEX_IS_PARENT_STOP_PLACE = "IS_PARENT_STOP_PLACE";
     static final String FINAL_STOP_PLACE_TYPE = "finalStopPlaceType";
     static final String SUBMODE = "submode";
+    static final String PUBLIC_CODE = "publicCode";
     static final String STOP_PLACE_TYPE = "stopPlaceType";
     static final String WEIGHTING = "weighting";
     static final String HAS_PARENT_SITE_REF = "hasParentSiteRef";
     static final String IS_PARENT_STOP_PLACE = "isParentStopPlace";
-
+    private static final Logger logger = LoggerFactory.getLogger(StopPlaceToGeoJsonFeatureMapper.class);
     private final ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper;
 
     @Autowired
@@ -67,16 +68,14 @@ public class StopPlaceToGeoJsonFeatureMapper {
 
         if (stopPlace.getStopPlaceType() != null) {
             feature.setProperty(STOP_PLACE_TYPE, stopPlace.getStopPlaceType().value());
-            if(!optionalSubmode.isPresent()) {
+            if (!optionalSubmode.isPresent()) {
                 feature.setProperty(FINAL_STOP_PLACE_TYPE, stopPlace.getStopPlaceType().value());
             }
         }
 
-        if (stopPlace.getWeighting() != null) {
-            feature.setProperty(WEIGHTING, stopPlace.getWeighting().value());
-        }
+        setIfNotNull(PUBLIC_CODE, stopPlace.getPublicCode(), feature::setProperty);
+        setResolvedValue(WEIGHTING, stopPlace.getWeighting(), feature::setProperty);
         feature.setProperty(HAS_PARENT_SITE_REF, String.valueOf(stopPlace.getParentSiteRef() != null));
-
         getValueByKey(stopPlace, NETEX_IS_PARENT_STOP_PLACE).ifPresent(isParent -> feature.setProperty(IS_PARENT_STOP_PLACE, isParent));
 
         return feature;
@@ -88,21 +87,13 @@ public class StopPlaceToGeoJsonFeatureMapper {
                 .filter(method -> method.getName().startsWith("get") && method.getName().endsWith("Submode"))
                 .map(method -> safeInvoke(method, stopPlace))
                 .filter(Objects::nonNull)
-                .map(this::getEnumValue)
+                .map(MapperHelper::getEnumValue)
                 .filter(Objects::nonNull)
                 .map(String::valueOf)
                 .filter(value -> !"unknown".equals(value))
                 .findAny();
     }
 
-    private Object getEnumValue(Object enumObject) {
-        try {
-            return enumObject.getClass().getMethod("value", null).invoke(enumObject);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            logger.warn("Error resolving value from enum {}", enumObject, e);
-        }
-        return null;
-    }
 
     private Object safeInvoke(Method method, StopPlace stopPlace) {
         try {

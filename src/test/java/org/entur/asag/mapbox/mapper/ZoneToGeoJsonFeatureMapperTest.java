@@ -25,13 +25,11 @@ import org.rutebanken.netex.model.*;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.entur.asag.mapbox.mapper.ZoneToGeoJsonFeatureMapper.DESCRIPTION;
-import static org.entur.asag.mapbox.mapper.ZoneToGeoJsonFeatureMapper.LANG;
-import static org.entur.asag.mapbox.mapper.ZoneToGeoJsonFeatureMapper.NAME;
+import static org.entur.asag.mapbox.mapper.MapperHelper.LANG;
+import static org.entur.asag.mapbox.mapper.ZoneToGeoJsonFeatureMapper.*;
 
 
 public class ZoneToGeoJsonFeatureMapperTest {
-
 
     @Test
     public void testMapZoneToFeature() throws JsonProcessingException {
@@ -40,22 +38,24 @@ public class ZoneToGeoJsonFeatureMapperTest {
 
         double longitude = 59.120694;
         double latitude = 11.386149;
-        StopPlace stopPlace = new StopPlace()
+
+        // Test fields not specific for stop place, but for zone
+        Zone_VersionStructure zone = new StopPlace()
                 .withId("NSR:StopPlace:1")
                 .withName(new MultilingualString().withValue(stopPlaceName))
                 .withDescription(new MultilingualString()
                         .withValue("description")
                         .withLang("nor"))
+                .withPrivateCode(new PrivateCodeStructure().withValue("privateCode"))
                 .withCentroid(new SimplePoint_VersionStructure()
                         .withLocation(new LocationStructure()
                                 .withLatitude(BigDecimal.valueOf(latitude)).withLongitude(BigDecimal.valueOf(longitude))));
 
-
-        Feature feature = new ZoneToGeoJsonFeatureMapper().mapZoneToGeoJson(stopPlace);
+        Feature feature = new ZoneToGeoJsonFeatureMapper().mapZoneToGeoJson(zone);
 
 
         assertThat(feature).isNotNull();
-        assertThat(feature.getId()).isEqualTo(stopPlace.getId());
+        assertThat(feature.getId()).isEqualTo(zone.getId());
         assertThat(feature.getGeometry()).isNotNull();
         assertThat(feature.getGeometry()).isInstanceOf(Point.class);
 
@@ -65,7 +65,7 @@ public class ZoneToGeoJsonFeatureMapperTest {
         String description = (String) feature.getProperties().get(DESCRIPTION);
         assertThat(description).isEqualTo("description");
 
-        String descriptionLang = (String) feature.getProperties().get(DESCRIPTION+LANG);
+        String descriptionLang = (String) feature.getProperties().get(DESCRIPTION + LANG);
         assertThat(descriptionLang).isEqualTo("nor");
 
         Point point = (Point) feature.getGeometry();
@@ -73,6 +73,8 @@ public class ZoneToGeoJsonFeatureMapperTest {
         assertThat(point.getCoordinates()).isNotNull();
         assertThat(point.getCoordinates().getLatitude()).isEqualTo(latitude);
         assertThat(point.getCoordinates().getLongitude()).isEqualTo(longitude);
+
+        assertThat(feature.getProperty(PRIVATE_CODE).toString()).isEqualTo("privateCode");
 
         String value = new ObjectMapper().writeValueAsString(feature);
         System.out.println(value);

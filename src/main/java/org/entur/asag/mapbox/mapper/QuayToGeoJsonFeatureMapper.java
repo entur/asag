@@ -27,10 +27,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.entur.asag.mapbox.mapper.MapperHelper.setIfNotNull;
+
 @Service
 public class QuayToGeoJsonFeatureMapper {
 
-private ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper;
+    static final String PUBLIC_CODE = "publicCode";
+
+    private ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper;
 
     @Autowired
     public QuayToGeoJsonFeatureMapper(ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper) {
@@ -40,7 +44,7 @@ private ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper;
     public Set<Feature> mapQuaysToGeojsonFeatures(Quays_RelStructure quays_relStructure) {
 
         Set<Feature> mappedQuays = new HashSet<>();
-        if(quays_relStructure != null && !CollectionUtils.isEmpty(quays_relStructure.getQuayRefOrQuay())) {
+        if (quays_relStructure != null && !CollectionUtils.isEmpty(quays_relStructure.getQuayRefOrQuay())) {
             return quays_relStructure.getQuayRefOrQuay().stream()
                     .filter(Objects::nonNull)
                     .filter(o -> o instanceof Quay)
@@ -54,7 +58,7 @@ private ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper;
     public Feature mapQuayToGeojsonFeature(Quay quay) {
 
         Feature feature = zoneToGeoJsonFeatureMapper.mapZoneToGeoJson(quay);
-
+        setIfNotNull(PUBLIC_CODE, quay.getPublicCode(), feature::setProperty);
         return feature;
 
     }

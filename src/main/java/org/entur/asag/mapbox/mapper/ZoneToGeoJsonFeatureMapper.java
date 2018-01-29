@@ -18,20 +18,22 @@ package org.entur.asag.mapbox.mapper;
 import org.geojson.Feature;
 import org.geojson.LngLatAlt;
 import org.geojson.Point;
-import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Zone_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import static org.entur.asag.mapbox.mapper.MapperHelper.mapMultilingualString;
+import static org.entur.asag.mapbox.mapper.MapperHelper.setPrivateCode;
+
 @Service
 public class ZoneToGeoJsonFeatureMapper {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZoneToGeoJsonFeatureMapper.class);
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
     public static final String ENTITY_TYPE = "entityType";
-    public static final String LANG = "Lang";
+    public static final String PRIVATE_CODE = "privateCode";
+    private static final Logger logger = LoggerFactory.getLogger(ZoneToGeoJsonFeatureMapper.class);
 
     public Feature mapZoneToGeoJson(Zone_VersionStructure zone) {
 
@@ -40,6 +42,7 @@ public class ZoneToGeoJsonFeatureMapper {
 
         mapMultilingualString(NAME, feature, zone.getName());
         mapMultilingualString(DESCRIPTION, feature, zone.getDescription());
+        setPrivateCode(PRIVATE_CODE, zone.getPrivateCode(), feature::setProperty);
 
         feature.setProperty(ENTITY_TYPE, zone.getClass().getSimpleName());
 
@@ -58,12 +61,4 @@ public class ZoneToGeoJsonFeatureMapper {
     }
 
 
-    public void mapMultilingualString(String property, Feature feature, MultilingualString multilingualString) {
-        if (multilingualString != null) {
-            feature.setProperty(property, multilingualString.getValue());
-            if (multilingualString.getLang() != null) {
-                feature.setProperty(property + LANG, multilingualString.getLang());
-            }
-        }
-    }
 }

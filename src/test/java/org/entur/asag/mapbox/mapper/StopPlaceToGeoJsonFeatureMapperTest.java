@@ -38,10 +38,11 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
                 .withStopPlaceType(StopTypeEnumeration.BUS_STATION)
                 .withAirSubmode(AirSubmodeEnumeration.AIRSHIP_SERVICE)
                 .withWeighting(InterchangeWeightingEnumeration.PREFERRED_INTERCHANGE)
+                .withPublicCode("Public code")
                 .withKeyList(new KeyListStructure()
-                    .withKeyValue(new KeyValueStructure()
-                            .withKey(NETEX_IS_PARENT_STOP_PLACE)
-                            .withValue("true")))
+                        .withKeyValue(new KeyValueStructure()
+                                .withKey(NETEX_IS_PARENT_STOP_PLACE)
+                                .withValue("true")))
                 .withParentSiteRef(new SiteRefStructure()
                         .withRef("NSR:StopPlace:2")
                         .withVersion("2"));
@@ -57,7 +58,7 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
         assertThat(properties.get(HAS_PARENT_SITE_REF)).isEqualTo("true");
         assertThat(properties.get(IS_PARENT_STOP_PLACE)).isEqualTo("true");
         assertThat(properties.get(WEIGHTING)).isEqualTo(stopPlace.getWeighting().value());
-
+        assertThat(feature.getProperties().get(PUBLIC_CODE)).isEqualTo(stopPlace.getPublicCode());
     }
 
     @Test
