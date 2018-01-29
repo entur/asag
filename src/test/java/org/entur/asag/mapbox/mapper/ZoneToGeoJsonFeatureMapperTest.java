@@ -75,6 +75,7 @@ public class ZoneToGeoJsonFeatureMapperTest {
         assertThat(point.getCoordinates().getLongitude()).isEqualTo(longitude);
 
         assertThat(feature.getProperty(PRIVATE_CODE).toString()).isEqualTo("privateCode");
+        assertThat(feature.getProperty(ID).toString()).isEqualTo(zone.getId());
 
         String value = new ObjectMapper().writeValueAsString(feature);
         System.out.println(value);
