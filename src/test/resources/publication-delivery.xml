@@ -34,8 +34,8 @@
                     <Name lang="nor">Drangedal stasjon</Name>
                     <Centroid>
                         <Location>
-                            <Longitude>9.064246</Longitude>
-                            <Latitude>59.096262</Latitude>
+                            <Longitude>10.758136</Longitude>
+                            <Latitude>59.911868</Latitude>
                         </Location>
                     </Centroid>
                     <StopPlaceType>railStation</StopPlaceType>
@@ -101,6 +101,18 @@
                     </quays>
                 </StopPlace>
             </stopPlaces>
+            <parkings>
+                <Parking created="2017-06-19T19:13:19.489" changed="2018-01-23T11:14:03.006" modification="new" version="4" id="NSR:Parking:99">
+                    <Value>NSB:Parking:269bike</Value>
+                    <ParkingVehicleTypes>pedalCycle</ParkingVehicleTypes>
+                    <Centroid>
+                        <Location>
+                            <Longitude>10.794161</Longitude>
+                            <Latitude>63.411566</Latitude>
+                        </Location>
+                    </Centroid>
+                </Parking>
+            </parkings>
         </SiteFrame>
     </dataObjects>
 </PublicationDelivery>

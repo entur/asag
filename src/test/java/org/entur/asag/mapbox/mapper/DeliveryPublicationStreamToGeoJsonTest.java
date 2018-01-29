@@ -38,7 +38,8 @@ public class DeliveryPublicationStreamToGeoJsonTest {
     private QuayToGeoJsonFeatureMapper quayToGeoJsonFeatureMapper = new QuayToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
     private StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper = new StopPlaceToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
     private ValidityFilter validityFilter = new ValidityFilter();
-    private DeliveryPublicationStreamToGeoJson deliveryPublicationStreamToGeoJson = new DeliveryPublicationStreamToGeoJson(stopPlaceToGeoJsonFeatureMapper, quayToGeoJsonFeatureMapper, validityFilter);
+    private ParkingToGeoJsonFeatureMapper parkingToGeoJsonFeatureMapper = new ParkingToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
+    private DeliveryPublicationStreamToGeoJson deliveryPublicationStreamToGeoJson = new DeliveryPublicationStreamToGeoJson(stopPlaceToGeoJsonFeatureMapper, parkingToGeoJsonFeatureMapper, quayToGeoJsonFeatureMapper, validityFilter);
 
     public DeliveryPublicationStreamToGeoJsonTest() throws JAXBException {
     }
@@ -50,6 +51,7 @@ public class DeliveryPublicationStreamToGeoJsonTest {
 
         ByteArrayOutputStream byteArrayOutputStream = (ByteArrayOutputStream) deliveryPublicationStreamToGeoJson.transform(fileInputStream);
 
+        System.out.println(byteArrayOutputStream.toString());
         FeatureCollection featureCollection =
                 new ObjectMapper().readValue(byteArrayOutputStream.toString(), FeatureCollection.class);
 
@@ -57,7 +59,7 @@ public class DeliveryPublicationStreamToGeoJsonTest {
         assertThat(featureCollection.getFeatures())
                 .isNotEmpty()
                 .extracting(Feature::getId)
-                .containsExactly("NSR:StopPlace:1", "NSR:StopPlace:10", "NSR:Quay:8");
+                .containsExactly("NSR:StopPlace:1", "NSR:StopPlace:10", "NSR:Quay:8", "NSR:Parking:99");
 
         System.out.println(featureCollection);
 
@@ -69,7 +71,7 @@ public class DeliveryPublicationStreamToGeoJsonTest {
 
 
         assertThat(resolvePropertiesByValue(featureCollection, "entityType"))
-                .contains("StopPlace", "StopPlace");
+                .contains("StopPlace", "StopPlace", "Parking", "Quay");
 
         assertThat(resolvePropertiesByValue(featureCollection, "finalStopPlaceType"))
                 .contains("onstreetBus", "railStation");

@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.util.function.BiConsumer;
 
 public class MapperHelper {
@@ -43,6 +44,12 @@ public class MapperHelper {
     public static void setIfNotNull(String key, String value, BiConsumer<String, String> consumer) {
         if (!Strings.isNullOrEmpty(value)) {
             consumer.accept(key, value);
+        }
+    }
+
+    public static void setIfNotNull(String key, BigInteger value, BiConsumer<String, String> consumer) {
+        if (value != null) {
+            consumer.accept(key, value.toString());
         }
     }
 
