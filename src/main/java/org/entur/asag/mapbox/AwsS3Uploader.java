@@ -20,22 +20,15 @@ import com.amazonaws.auth.BasicSessionCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectResult;
-import com.amazonaws.services.s3.model.S3Object;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.entur.asag.mapbox.model.MapBoxAwsCredentials;
 import org.apache.camel.Body;
 import org.apache.camel.Header;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.entur.asag.mapbox.model.MapBoxAwsCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
