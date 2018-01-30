@@ -98,6 +98,7 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
                 .to("direct:findFirstXmlFileRecursive")
                 .to("direct:transformToGeoJsonFromTiamat")
                 .setHeader(FILE_NAME, constant(geojsonFilename))
+                .to("file://" + localWorkingDirectory + "?fileName=" + geojsonFilename)
                 .to("direct:uploadMapboxDataAws")
                 .to("direct:initiateMapboxUpload")
                 .delay(mapboxUploadPollDelay)
