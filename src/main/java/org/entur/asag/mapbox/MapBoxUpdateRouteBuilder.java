@@ -76,7 +76,7 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
     @Value("${mapbox.upload.status.max.retries:10}")
     private int mapboxUploadPollMaxRetries;
 
-    @Value("${mapbox.upload.status.poll.delay:15000}")
+    @Value("${mapbox.upload.status.poll.delay:20000}")
     private int mapboxUploadPollDelay;
 
     @Override
@@ -90,6 +90,7 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
         final String geojsonFilename = (Strings.isNullOrEmpty(projectId) ? mapboxUser : projectId) + ".geojson";
 
         from("direct:uploadTiamatToMapboxAsGeoJson")
+                .bean("uploadStatusHubotReporter", "postStarted")
                 .setHeader(TIAMAT_EXPORT_GCP_PATH, simple(blobStoreSubdirectoryForTiamatGeoCoderExport + "/" + TIAMAT_EXPORT_LATEST_FILE_NAME))
                 .to("direct:recreateLocalMapboxDirectory")
                 .to("direct:downloadLatestTiamatExportToMapboxFolder")
@@ -138,17 +139,26 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
                     .when(simple("${body.complete}"))
                         .log(LoggingLevel.INFO,"Tileset upload complete: ${body.id}")
                         .setProperty(PROPERTY_STATE, simple(STATE_FINISHED))
+                        .bean("uploadStatusHubotReporter", "postUploadStatusToHubot")
                         .stop()
                     .otherwise()
-                        .log(LoggingLevel.INFO, "Tileset upload ${body.id}: Not complete yet.. wait a bit and try again. (${header.\"" + LOOP_COUNTER + "\"})")
-                        .delay(mapboxUploadPollDelay)
-                        .to("direct:fetchMapboxUploadStatus")
+                        .choice()
+                            .when(simple("${body.message}"))
+                            .log(LoggingLevel.INFO, "Got message, Exiting: ${body.message}")
+                            .bean("uploadStatusHubotReporter", "postUploadStatusToHubot")
+                            .stop()
+                        .otherwise()
+                            .log(LoggingLevel.INFO, "Tileset upload ${body.id}: Not complete yet.. wait a bit and try again. (${header.\"" + LOOP_COUNTER + "\"})")
+                            .delay(mapboxUploadPollDelay)
+                            .to("direct:fetchMapboxUploadStatus")
+                        .end()
                 .endChoice()
 
                 .choice()
                     .when(simple("${header." + LOOP_COUNTER + "} > " + mapboxUploadPollMaxRetries))
                         .log(LoggingLevel.WARN, getClass().getName(), "Giving up after looping after " + mapboxUploadPollMaxRetries + " iterations")
-                .setProperty(PROPERTY_STATE, simple(STATE_TIMEOUT))
+                        .setProperty(PROPERTY_STATE, simple(STATE_TIMEOUT))
+                        .bean("uploadStatusHubotReporter", "postUploadStatusToHubot")
                         .stop() // end route?
                 .endChoice()
                 .routeId("mapbox-poll-retry-upload-status");
@@ -158,6 +168,7 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
                     .when(simple("${body.error}"))
                     .log(LoggingLevel.ERROR, "Got error uploading tileset. ${body}")
                     .setProperty(PROPERTY_STATE, simple(STATE_ERROR))
+                    .bean("uploadStatusHubotReporter", "postUploadStatusToHubot")
                     .stop()
                 .endChoice()
                 .routeId("mapbox-end-if-upload-error");
