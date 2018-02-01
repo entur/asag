@@ -21,9 +21,12 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.model.ModelCamelContext;
 import org.entur.asag.mapbox.MapBoxUpdateRouteBuilder;
+import org.entur.asag.mapbox.model.MapBoxUploadStatus;
 import org.entur.asag.service.BlobStoreService;
+import org.entur.asag.service.UploadStatusHubotReporter;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +38,7 @@ import java.io.FileInputStream;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.entur.asag.mapbox.MapBoxUpdateRouteBuilder.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 
@@ -45,7 +49,8 @@ import static org.mockito.Mockito.when;
                 "mapbox.upload.status.poll.delay=0",
                 "blobstore.gcs.container.name=container",
                 "blobstore.gcs.credential.path=credpath",
-                "blobstore.gcs.project.id=123"
+                "blobstore.gcs.project.id=123",
+                "helper.hubot.endpoint=http://localhost:${wiremock.server.port}/hubot/say/"
 
         })
 @AutoConfigureWireMock(port = 0)
@@ -80,6 +85,9 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
     @Autowired
     private BlobStoreService blobStoreService;
 
+    @Autowired
+    private UploadStatusHubotReporter uploadStatusHubotReporter;
+
     @Value("${wiremock.server.port}")
     private int wiremockServerPort;
 
@@ -92,6 +100,8 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
         when(blobStoreService
                 .getBlob(blobStoreSubdirectoryForTiamatGeoCoderExport + "/" + TIAMAT_EXPORT_LATEST_FILE_NAME))
                 .thenReturn(new FileInputStream(new File(getClass().getResource("/stops.zip").getFile())));
+
+        stubHubot();
         context.start();
     }
 
@@ -137,6 +147,11 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
 
     private void assertState(Exchange e, String state) {
         assertThat(e.getProperties().get(PROPERTY_STATE)).isEqualTo(state);
+    }
+
+    private void stubHubot() {
+        stubFor(post(urlEqualTo("/hubot/say/"))
+        .willReturn(aResponse().withBody("OK")));
     }
 
     private void stubError() {
