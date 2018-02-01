@@ -82,9 +82,9 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
     @Override
     public void configure() throws Exception {
 
-        /**
-         * 	the map ID to create or replace in the format  username.nameoftileset - limited to 32 characters
-         * 	(only  - and  _ special characters allowed, limit does not include username)
+        /*
+          	the map ID to create or replace in the format  username.nameoftileset - limited to 32 characters
+          	(only  - and  _ special characters allowed, limit does not include username)
          */
         final String tilesetName = mapboxUser + "." + (Strings.isNullOrEmpty(projectId) ? "tileset" : projectId);
         final String geojsonFilename = (Strings.isNullOrEmpty(projectId) ? mapboxUser : projectId) + ".geojson";
