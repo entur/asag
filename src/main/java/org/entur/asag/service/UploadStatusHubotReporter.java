@@ -16,6 +16,7 @@
 package org.entur.asag.service;
 
 import org.apache.camel.Body;
+import org.apache.camel.ExchangeProperty;
 import org.entur.asag.mapbox.model.MapBoxUploadStatus;
 import org.rutebanken.helper.hubot.HubotPostService;
 import org.slf4j.Logger;
@@ -24,12 +25,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import static org.entur.asag.mapbox.MapBoxUpdateRouteBuilder.PROPERTY_STATE;
+
 @Service
 public class UploadStatusHubotReporter {
 
     private static final Logger logger = LoggerFactory.getLogger(UploadStatusHubotReporter.class);
 
     private static final String ICON = ":world_map:";
+
+    private static final String OK_ICON = ":golfer:";
 
     private static final String WARN_ICON = ":fire:";
 
@@ -44,20 +49,23 @@ public class UploadStatusHubotReporter {
         hubotPostService.publish(new HubotPostService.HubotMessage("Started mapbox update", hostName, ICON));
     }
 
+    public void postUploadStatusToHubot(@Body MapBoxUploadStatus mapBoxUploadStatus, @ExchangeProperty(PROPERTY_STATE) String state) {
 
-    public void postUploadStatusToHubot(@Body MapBoxUploadStatus mapBoxUploadStatus) {
-
-        final String pre = "Upload " + mapBoxUploadStatus.getId() + ", name: " + mapBoxUploadStatus.getName() + ",  tileset: " + mapBoxUploadStatus.getTileset();
-        final String message;
+        String message;
 
         if (mapBoxUploadStatus.getComplete()) {
-            message = pre + " complete";
+            message = "Tilset `" + mapBoxUploadStatus.getTileset() + "` uploaded to mapbox successfully " + OK_ICON + ".";
         } else {
-            message = pre + " " +WARN_ICON + " message: `" + mapBoxUploadStatus.getMessage() + "`, error: " + mapBoxUploadStatus.getError();
+            message = state != null ? "*" + state + "*: " : "";
+            message += "Upload `" + mapBoxUploadStatus.getId()
+                    + "`, name: `" + mapBoxUploadStatus.getName()
+                    + "`, tileset: `" + mapBoxUploadStatus.getTileset()
+                    + "`, message: `" + mapBoxUploadStatus.getMessage()
+                    + "`, error: " + mapBoxUploadStatus.getError()
+                    + " " + WARN_ICON;
         }
 
         logger.info("About to post message to hubot: {}", message);
-
 
         hubotPostService.publish(new HubotPostService.HubotMessage(message, hostName, ICON));
     }
