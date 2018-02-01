@@ -42,7 +42,7 @@ public class MapBoxUploadStatus {
     private String name;
 
     @JsonProperty("complete")
-    private Boolean complete;
+    private boolean complete;
 
     @JsonProperty("error")
     private Object error;
