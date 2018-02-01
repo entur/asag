@@ -73,7 +73,7 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
     @Value("${mapbox.aws.region:us-east-1")
     private String awsRegion;
 
-    @Value("${mapbox.upload.status.max.retries:10}")
+    @Value("${mapbox.upload.status.max.retries:20}")
     private int mapboxUploadPollMaxRetries;
 
     @Value("${mapbox.upload.status.poll.delay:20000}")
