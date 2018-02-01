@@ -30,28 +30,40 @@ import org.codehaus.jackson.annotate.JsonProperty;
         "modified",
         "tileset",
         "owner",
-        "progress"
+        "progress",
+        "message"
 })
 public class MapBoxUploadStatus {
 
     @JsonProperty("id")
     private String id;
+
     @JsonProperty("name")
     private String name;
+
     @JsonProperty("complete")
     private Boolean complete;
+
     @JsonProperty("error")
     private Object error;
+
     @JsonProperty("created")
     private String created;
+
     @JsonProperty("modified")
     private String modified;
+
     @JsonProperty("tileset")
     private String tileset;
+
     @JsonProperty("owner")
     private String owner;
+
     @JsonProperty("progress")
     private Integer progress;
+
+    @JsonProperty("message")
+    private String message;
 
     @JsonProperty("id")
     public String getId() {
@@ -143,6 +155,16 @@ public class MapBoxUploadStatus {
         this.progress = progress;
     }
 
+    @JsonProperty("message")
+    public String getMessage() {
+        return message;
+    }
+
+    @JsonProperty("message")
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
 
     @Override
     public String toString() {
@@ -156,6 +178,9 @@ public class MapBoxUploadStatus {
                 .add("tileset", tileset)
                 .add("owner", owner)
                 .add("progress", progress)
+                .add("message", message)
                 .toString();
     }
+
+
 }
