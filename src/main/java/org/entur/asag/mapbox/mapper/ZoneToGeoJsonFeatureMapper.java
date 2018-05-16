@@ -15,17 +15,24 @@
 
 package org.entur.asag.mapbox.mapper;
 
+import net.opengis.gml._3.AbstractRingPropertyType;
+import net.opengis.gml._3.DirectPositionListType;
+import net.opengis.gml._3.LinearRingType;
 import org.geojson.Feature;
 import org.geojson.LngLatAlt;
 import org.geojson.Point;
+import org.geojson.Polygon;
 import org.rutebanken.netex.model.Zone_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import static org.entur.asag.mapbox.mapper.MapperHelper.mapMultilingualString;
-import static org.entur.asag.mapbox.mapper.MapperHelper.setIfNotNull;
-import static org.entur.asag.mapbox.mapper.MapperHelper.setPrivateCode;
+import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.entur.asag.mapbox.mapper.MapperHelper.*;
 
 @Service
 public class ZoneToGeoJsonFeatureMapper {
@@ -56,12 +63,35 @@ public class ZoneToGeoJsonFeatureMapper {
             LngLatAlt lngLatAlt = new LngLatAlt(longitude, latitude);
             Point multiPoint = new Point(lngLatAlt);
             feature.setGeometry(multiPoint);
+        } else if (zone.getPolygon() != null) {
+            List<Double> doubles = extractValues(zone.getPolygon().getExterior());
+            Polygon polygon = new Polygon(convertCoordinateListToLngLatList(doubles));
+            feature.setGeometry(polygon);
         } else {
-            logger.warn("Cannot find centroid for Zone with ID: " + zone.getId());
+            logger.warn("Cannot find centroid or polygon for Zone with ID: " + zone.getId());
         }
 
         return feature;
     }
 
+    public List<LngLatAlt> convertCoordinateListToLngLatList(List<Double> coordinateList) {
+        List<LngLatAlt> lngLatAlts = new ArrayList<>();
+        for (int index = 0; index < coordinateList.size(); index += 2) {
+            LngLatAlt lngLatAlt = new LngLatAlt(coordinateList.get(index), coordinateList.get(index + 1));
+            lngLatAlts.add(lngLatAlt);
+        }
+        return lngLatAlts;
 
+    }
+
+
+    public List<Double> extractValues(AbstractRingPropertyType abstractRingPropertyType) {
+        return Optional.of(abstractRingPropertyType)
+                .map(AbstractRingPropertyType::getAbstractRing)
+                .map(JAXBElement::getValue)
+                .map(abstractRing -> ((LinearRingType) abstractRing))
+                .map(LinearRingType::getPosList)
+                .map(DirectPositionListType::getValue)
+                .get();
+    }
 }

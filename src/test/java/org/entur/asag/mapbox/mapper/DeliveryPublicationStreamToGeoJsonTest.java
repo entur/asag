@@ -39,7 +39,8 @@ public class DeliveryPublicationStreamToGeoJsonTest {
     private StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper = new StopPlaceToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
     private ValidityFilter validityFilter = new ValidityFilter();
     private ParkingToGeoJsonFeatureMapper parkingToGeoJsonFeatureMapper = new ParkingToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
-    private DeliveryPublicationStreamToGeoJson deliveryPublicationStreamToGeoJson = new DeliveryPublicationStreamToGeoJson(stopPlaceToGeoJsonFeatureMapper, parkingToGeoJsonFeatureMapper, quayToGeoJsonFeatureMapper, validityFilter);
+    private TariffZoneToGeoJsonFeatureMapper tariffZoneToGeoJsonFeatureMapper = new TariffZoneToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
+    private DeliveryPublicationStreamToGeoJson deliveryPublicationStreamToGeoJson = new DeliveryPublicationStreamToGeoJson(stopPlaceToGeoJsonFeatureMapper, parkingToGeoJsonFeatureMapper, quayToGeoJsonFeatureMapper, tariffZoneToGeoJsonFeatureMapper, validityFilter);
 
     public DeliveryPublicationStreamToGeoJsonTest() throws JAXBException {
     }
@@ -59,7 +60,7 @@ public class DeliveryPublicationStreamToGeoJsonTest {
         assertThat(featureCollection.getFeatures())
                 .isNotEmpty()
                 .extracting(Feature::getId)
-                .containsExactly("NSR:StopPlace:1", "NSR:StopPlace:10", "NSR:Quay:8", "NSR:Parking:99");
+                .containsExactly("NSR:StopPlace:1", "NSR:StopPlace:10", "NSR:Quay:8", "NSR:Parking:99", "VKT:TariffZone:729");
 
         System.out.println(featureCollection);
 
@@ -71,7 +72,7 @@ public class DeliveryPublicationStreamToGeoJsonTest {
 
 
         assertThat(resolvePropertiesByValue(featureCollection, "entityType"))
-                .contains("StopPlace", "StopPlace", "Parking", "Quay");
+                .contains("StopPlace", "StopPlace", "Parking", "Quay", "TariffZone");
 
         assertThat(resolvePropertiesByValue(featureCollection, "finalStopPlaceType"))
                 .contains("onstreetBus", "railStation");

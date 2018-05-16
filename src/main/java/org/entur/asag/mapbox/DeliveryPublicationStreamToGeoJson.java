@@ -20,11 +20,13 @@ import org.entur.asag.mapbox.filter.ValidityFilter;
 import org.entur.asag.mapbox.mapper.ParkingToGeoJsonFeatureMapper;
 import org.entur.asag.mapbox.mapper.QuayToGeoJsonFeatureMapper;
 import org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper;
+import org.entur.asag.mapbox.mapper.TariffZoneToGeoJsonFeatureMapper;
 import org.entur.asag.netex.PublicationDeliveryHelper;
 import org.geojson.Feature;
 import org.rutebanken.netex.model.EntityInVersionStructure;
 import org.rutebanken.netex.model.Parking;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.TariffZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +54,10 @@ public class DeliveryPublicationStreamToGeoJson {
 
     private final QuayToGeoJsonFeatureMapper quayToGeoJsonFeatureMapper;
 
+    private final TariffZoneToGeoJsonFeatureMapper tariffZoneToGeoJsonFeatureMapper;
+
     private final ValidityFilter validityFilter;
+
 
     private ObjectMapper jacksonObjectMapper = new ObjectMapper();
 
@@ -63,15 +68,20 @@ public class DeliveryPublicationStreamToGeoJson {
     private final Unmarshaller unmarshaller;
 
     @Autowired
-    public DeliveryPublicationStreamToGeoJson(StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper, ParkingToGeoJsonFeatureMapper parkingToGeoJsonFeatureMapper, QuayToGeoJsonFeatureMapper quayToGeoJsonFeatureMapper, ValidityFilter validityFilter) throws JAXBException {
+    public DeliveryPublicationStreamToGeoJson(StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper,
+                                              ParkingToGeoJsonFeatureMapper parkingToGeoJsonFeatureMapper,
+                                              QuayToGeoJsonFeatureMapper quayToGeoJsonFeatureMapper,
+                                              TariffZoneToGeoJsonFeatureMapper tariffZoneToGeoJsonFeatureMapper, ValidityFilter validityFilter) throws JAXBException {
         this.stopPlaceToGeoJsonFeatureMapper = stopPlaceToGeoJsonFeatureMapper;
         this.parkingToGeoJsonFeatureMapper = parkingToGeoJsonFeatureMapper;
         this.quayToGeoJsonFeatureMapper = quayToGeoJsonFeatureMapper;
+        this.tariffZoneToGeoJsonFeatureMapper = tariffZoneToGeoJsonFeatureMapper;
         this.validityFilter = validityFilter;
         unmarshaller = PublicationDeliveryHelper.createUnmarshaller();
 
         mappableTypes.put("StopPlace", StopPlace.class);
         mappableTypes.put("Parking", Parking.class);
+        mappableTypes.put("TariffZone", TariffZone.class);
     }
 
     public OutputStream transform(InputStream publicationDeliveryStream) {
@@ -126,6 +136,8 @@ public class DeliveryPublicationStreamToGeoJson {
                     writeStop((StopPlace) unmarshalledEntity, outputStream, outputStreamWriter);
                 } else if(Parking.class.isAssignableFrom(clazz)) {
                     writeParking((Parking) unmarshalledEntity, outputStream);
+                } else if(TariffZone.class.isAssignableFrom(clazz)) {
+                    writeTariffZone((TariffZone) unmarshalledEntity, outputStream, outputStreamWriter);
                 }
 
 
@@ -152,6 +164,11 @@ public class DeliveryPublicationStreamToGeoJson {
             writeComma(outputStreamWriter);
             jacksonObjectMapper.writeValue(outputStream, quayFeature);
         }
+    }
+
+    private void writeTariffZone(TariffZone tariffZone, OutputStream outputStream, OutputStreamWriter outputStreamWriter) throws IOException {
+        Feature feature = tariffZoneToGeoJsonFeatureMapper.mapTariffZoneToGeoJson(tariffZone);
+        jacksonObjectMapper.writeValue(outputStream, feature);
     }
 
     private void writeComma(OutputStreamWriter outputStreamWriter) throws IOException {

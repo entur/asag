@@ -17,12 +17,17 @@ package org.entur.asag.mapbox.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.opengis.gml._3.*;
+import net.opengis.gml._3.ObjectFactory;
 import org.geojson.Feature;
 import org.geojson.Point;
+import org.geojson.Polygon;
 import org.junit.Test;
 import org.rutebanken.netex.model.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.entur.asag.mapbox.mapper.MapperHelper.LANG;
@@ -30,6 +35,8 @@ import static org.entur.asag.mapbox.mapper.ZoneToGeoJsonFeatureMapper.*;
 
 
 public class ZoneToGeoJsonFeatureMapperTest {
+
+    private static final net.opengis.gml._3.ObjectFactory openGisObjectFactory = new ObjectFactory();
 
     @Test
     public void testMapZoneToFeature() throws JsonProcessingException {
@@ -81,4 +88,63 @@ public class ZoneToGeoJsonFeatureMapperTest {
         System.out.println(value);
     }
 
+
+    @Test
+    public void testMapZoneWithPolygonToFeature() throws JsonProcessingException {
+
+        String zoneName = "A name";
+
+        PolygonType polygonType = createPolygonType();
+
+
+        // Test fields not specific for stop place, but for zone
+        Zone_VersionStructure zone = new TariffZone()
+                .withId("NSR:TariffZone:1")
+                .withName(new MultilingualString().withValue(zoneName))
+                .withPolygon(polygonType);
+
+        Feature feature = new ZoneToGeoJsonFeatureMapper().mapZoneToGeoJson(zone);
+
+
+        assertThat(feature).isNotNull();
+        assertThat(feature.getId()).isEqualTo(zone.getId());
+        assertThat(feature.getGeometry())
+                .as("feature.geometry")
+                .isNotNull()
+                .isInstanceOf(Polygon.class);
+
+        Polygon polygon = (Polygon) feature.getGeometry();
+
+        assertThat(polygon.getCoordinates()).isNotNull();
+
+
+        String value = new ObjectMapper().writeValueAsString(feature);
+        System.out.println(value);
+    }
+    private PolygonType createPolygonType() {
+        List<Double> values = new ArrayList<>();
+        values.add(9.8468);
+        values.add(59.2649);
+        values.add(9.8456);
+        values.add(59.2654);
+        values.add(9.8457);
+        values.add(59.2655);
+        values.add(9.8443);
+        values.add(59.2663);
+        values.add(values.get(0));
+        values.add(values.get(1));
+
+        DirectPositionListType positionList = new DirectPositionListType().withValue(values);
+
+        LinearRingType linearRing = new LinearRingType()
+                .withPosList(positionList);
+
+        PolygonType polygonType = new PolygonType()
+                .withId("KVE-07")
+                .withExterior(new AbstractRingPropertyType()
+                        .withAbstractRing(openGisObjectFactory.createLinearRing(linearRing)));
+
+        return polygonType;
+
+    }
 }
