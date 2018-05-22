@@ -21,10 +21,14 @@ import org.entur.asag.mapbox.filter.ValidityFilter;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.junit.Test;
+import org.rutebanken.netex.validation.NeTExValidator;
+import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -42,13 +46,17 @@ public class DeliveryPublicationStreamToGeoJsonTest {
     private TariffZoneToGeoJsonFeatureMapper tariffZoneToGeoJsonFeatureMapper = new TariffZoneToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
     private DeliveryPublicationStreamToGeoJson deliveryPublicationStreamToGeoJson = new DeliveryPublicationStreamToGeoJson(stopPlaceToGeoJsonFeatureMapper, parkingToGeoJsonFeatureMapper, quayToGeoJsonFeatureMapper, tariffZoneToGeoJsonFeatureMapper, validityFilter);
 
-    public DeliveryPublicationStreamToGeoJsonTest() throws JAXBException {
+    private NeTExValidator neTExValidator = new NeTExValidator();
+
+    public DeliveryPublicationStreamToGeoJsonTest() throws JAXBException, IOException, SAXException {
     }
 
     @Test
     public void transform() throws Exception {
 
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/publication-delivery.xml");
+
+        neTExValidator.validate(new StreamSource(fileInputStream));
 
         ByteArrayOutputStream byteArrayOutputStream = (ByteArrayOutputStream) deliveryPublicationStreamToGeoJson.transform(fileInputStream);
 
