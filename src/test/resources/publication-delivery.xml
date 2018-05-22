@@ -15,6 +15,7 @@
   -->
 
 <PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xmlns:gml="http://www.opengis.net/gml/3.2"
                      version="139" xsi:schemaLocation="">
     <PublicationTimestamp>2018-01-16T02:58:31.377</PublicationTimestamp>
     <ParticipantRef>NSR</ParticipantRef>
@@ -103,8 +104,7 @@
             </stopPlaces>
             <parkings>
                 <Parking created="2017-06-19T19:13:19.489" changed="2018-01-23T11:14:03.006" modification="new" version="4" id="NSR:Parking:99">
-                    <Value>NSB:Parking:269bike</Value>
-                    <ParkingVehicleTypes>pedalCycle</ParkingVehicleTypes>
+                    <Name lang="nor">Parkeringen</Name>
                     <Centroid>
                         <Location>
                             <Longitude>10.794161</Longitude>
@@ -116,13 +116,13 @@
             <tariffZones>
                 <TariffZone created="2018-05-14T13:59:41.362" modification="new" version="1" id="VKT:TariffZone:729">
                     <Name lang="nor">Bolærene</Name>
-                    <Polygon id="GEN-PolygonType-23449">
-                        <exterior>
-                            <LinearRing>
-                                <posList>59.19325200734 10.47906867027 59.18555854825 10.47434798241 59.1552823 10.4628582 59.14873791493 10.4883382988 59.15252299004 10.54670316696 59.16686726457 10.60695631027 59.19993296444 10.61759931564 59.23683024321 10.55768949509 59.24130791157 10.50550443649 59.24034218969 10.49983961105 59.21654167617 10.49468976974 59.19325200734 10.47906867027</posList>
-                            </LinearRing>
-                        </exterior>
-                    </Polygon>
+                    <gml:Polygon gml:id="GEN-PolygonType-23449">
+                        <gml:exterior>
+                            <gml:LinearRing>
+                                <gml:posList>59.19325200734 10.47906867027 59.18555854825 10.47434798241 59.1552823 10.4628582 59.14873791493 10.4883382988 59.15252299004 10.54670316696 59.16686726457 10.60695631027 59.19993296444 10.61759931564 59.23683024321 10.55768949509 59.24130791157 10.50550443649 59.24034218969 10.49983961105 59.21654167617 10.49468976974 59.19325200734 10.47906867027</gml:posList>
+                            </gml:LinearRing>
+                        </gml:exterior>
+                    </gml:Polygon>
                 </TariffZone>
             </tariffZones>
         </SiteFrame>

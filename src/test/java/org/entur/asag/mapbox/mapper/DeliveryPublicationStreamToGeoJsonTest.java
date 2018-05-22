@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DeliveryPublicationStreamToGeoJsonTest {
 
 
+    public static final String SRC_TEST_RESOURCES_PUBLICATION_DELIVERY_XML = "src/test/resources/publication-delivery.xml";
     private ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper = new ZoneToGeoJsonFeatureMapper();
     private QuayToGeoJsonFeatureMapper quayToGeoJsonFeatureMapper = new QuayToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
     private StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper = new StopPlaceToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
@@ -54,10 +55,9 @@ public class DeliveryPublicationStreamToGeoJsonTest {
     @Test
     public void transform() throws Exception {
 
-        FileInputStream fileInputStream = new FileInputStream("src/test/resources/publication-delivery.xml");
+        neTExValidator.validate(new StreamSource(new FileInputStream(SRC_TEST_RESOURCES_PUBLICATION_DELIVERY_XML)));
 
-        neTExValidator.validate(new StreamSource(fileInputStream));
-
+        FileInputStream fileInputStream = new FileInputStream(SRC_TEST_RESOURCES_PUBLICATION_DELIVERY_XML);
         ByteArrayOutputStream byteArrayOutputStream = (ByteArrayOutputStream) deliveryPublicationStreamToGeoJson.transform(fileInputStream);
 
         System.out.println(byteArrayOutputStream.toString());
