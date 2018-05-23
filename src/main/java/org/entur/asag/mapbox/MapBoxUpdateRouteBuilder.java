@@ -208,7 +208,7 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
 
         from("direct:recreateLocalMapboxDirectory")
                 .setHeader(Exchange.FILE_PARENT, constant(localWorkingDirectory))
-                .to("direct:cleanUpLocalDirectory")
+//                .to("direct:cleanUpLocalDirectory")
                 .process(e -> new File(localWorkingDirectory).mkdirs())
                 .routeId("mapbox-recreate-mapbox-directory");
 
