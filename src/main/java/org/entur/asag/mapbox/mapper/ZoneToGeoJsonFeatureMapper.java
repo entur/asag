@@ -77,7 +77,7 @@ public class ZoneToGeoJsonFeatureMapper {
     public List<LngLatAlt> convertCoordinateListToLngLatList(List<Double> coordinateList) {
         List<LngLatAlt> lngLatAlts = new ArrayList<>();
         for (int index = 0; index < coordinateList.size(); index += 2) {
-            LngLatAlt lngLatAlt = new LngLatAlt(coordinateList.get(index), coordinateList.get(index + 1));
+            LngLatAlt lngLatAlt = new LngLatAlt(coordinateList.get(index + 1), coordinateList.get(index));
             lngLatAlts.add(lngLatAlt);
         }
         return lngLatAlts;

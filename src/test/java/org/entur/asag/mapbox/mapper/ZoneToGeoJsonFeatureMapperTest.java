@@ -115,8 +115,11 @@ public class ZoneToGeoJsonFeatureMapperTest {
 
         Polygon polygon = (Polygon) feature.getGeometry();
 
-        assertThat(polygon.getCoordinates()).isNotNull();
-
+        assertThat(polygon.getCoordinates())
+                .isNotNull()
+                .extracting(lngLatAlts -> lngLatAlts.get(0))
+                .extracting(list -> list.getLatitude() + ", " + list.getLongitude())
+                .contains("9.8468, 59.2649");
 
         String value = new ObjectMapper().writeValueAsString(feature);
         System.out.println(value);
