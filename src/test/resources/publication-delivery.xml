@@ -124,6 +124,9 @@
                         </gml:exterior>
                     </gml:Polygon>
                 </TariffZone>
+                <TariffZone created="2018-05-14T13:59:41.362" modification="new" version="1" id="VKT:TariffZone:788">
+                    <Name lang="nor">No geometry found here</Name>
+                </TariffZone>
             </tariffZones>
         </SiteFrame>
     </dataObjects>

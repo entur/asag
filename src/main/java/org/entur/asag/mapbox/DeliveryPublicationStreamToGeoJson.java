@@ -23,10 +23,7 @@ import org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper;
 import org.entur.asag.mapbox.mapper.TariffZoneToGeoJsonFeatureMapper;
 import org.entur.asag.netex.PublicationDeliveryHelper;
 import org.geojson.Feature;
-import org.rutebanken.netex.model.EntityInVersionStructure;
-import org.rutebanken.netex.model.Parking;
-import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.TariffZone;
+import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,6 +124,15 @@ public class DeliveryPublicationStreamToGeoJson {
         if (clazz.getSimpleName().equals(localPartOfName)) {
             T unmarshalledEntity = unmarshaller.unmarshal(xmlEventReader, clazz).getValue();
             if (validityFilter.isValidNow(unmarshalledEntity.getValidBetween())) {
+
+                if(unmarshalledEntity instanceof Zone_VersionStructure) {
+                    Zone_VersionStructure zone = (Zone_VersionStructure) unmarshalledEntity;
+                    if(zone.getPolygon() == null && zone.getCentroid() == null) {
+                        logger.warn("Got zone ({}) without centroid and polygon. Ignoring it.", zone.getId());
+                        return lastWasMapped;
+                    }
+                }
+
 
                 if (lastWasMapped) {
                     writeComma(outputStreamWriter);
