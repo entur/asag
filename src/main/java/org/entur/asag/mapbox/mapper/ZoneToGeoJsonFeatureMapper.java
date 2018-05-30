@@ -15,6 +15,7 @@
 
 package org.entur.asag.mapbox.mapper;
 
+import com.google.common.base.CharMatcher;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LinearRingType;
@@ -42,6 +43,8 @@ public class ZoneToGeoJsonFeatureMapper {
     public static final String DESCRIPTION = "description";
     public static final String ENTITY_TYPE = "entityType";
     public static final String PRIVATE_CODE = "privateCode";
+    public static final String CODE_SPACE = "codeSpace";
+
     private static final Logger logger = LoggerFactory.getLogger(ZoneToGeoJsonFeatureMapper.class);
 
     public Feature mapZoneToGeoJson(Zone_VersionStructure zone) {
@@ -53,26 +56,38 @@ public class ZoneToGeoJsonFeatureMapper {
         mapMultilingualString(DESCRIPTION, feature, zone.getDescription());
         setPrivateCode(PRIVATE_CODE, zone.getPrivateCode(), feature::setProperty);
         setIfNotNull(ID, zone.getId(), feature::setProperty);
-
+        parseAndMapCodeSpace(zone, feature);
         feature.setProperty(ENTITY_TYPE, zone.getClass().getSimpleName());
 
-        if (zone.getCentroid() != null && zone.getCentroid().getLocation() != null) {
-            double latitude = zone.getCentroid().getLocation().getLatitude().doubleValue();
-            double longitude = zone.getCentroid().getLocation().getLongitude().doubleValue();
-
-            LngLatAlt lngLatAlt = new LngLatAlt(longitude, latitude);
-            Point multiPoint = new Point(lngLatAlt);
-            feature.setGeometry(multiPoint);
-        } else if (zone.getPolygon() != null) {
-            List<Double> doubles = extractValues(zone.getPolygon().getExterior());
-            Polygon polygon = new Polygon(convertCoordinateListToLngLatList(doubles));
-            feature.setGeometry(polygon);
-        } else {
-            logger.warn("Cannot find centroid or polygon for Zone with ID: " + zone.getId());
-        }
+        mapGeometry(zone, feature);
 
         return feature;
     }
+
+    public void parseAndMapCodeSpace(Zone_VersionStructure zone, Feature feature) {
+        if(zone.getId() != null) {
+            if(CharMatcher.is(':').countIn(zone.getId()) == 2) {
+                feature.setProperty(CODE_SPACE, zone.getId().split(":")[0]);
+            }
+        }
+    }
+
+    public void mapGeometry(Zone_VersionStructure zone, Feature feature) {
+            if (zone.getCentroid() != null && zone.getCentroid().getLocation() != null) {
+                double latitude = zone.getCentroid().getLocation().getLatitude().doubleValue();
+                double longitude = zone.getCentroid().getLocation().getLongitude().doubleValue();
+
+                LngLatAlt lngLatAlt = new LngLatAlt(longitude, latitude);
+                Point multiPoint = new Point(lngLatAlt);
+                feature.setGeometry(multiPoint);
+            } else if (zone.getPolygon() != null) {
+                List<Double> doubles = extractValues(zone.getPolygon().getExterior());
+                Polygon polygon = new Polygon(convertCoordinateListToLngLatList(doubles));
+                feature.setGeometry(polygon);
+            } else {
+                logger.warn("Cannot find centroid or polygon for Zone with ID: " + zone.getId());
+            }
+        }
 
     public List<LngLatAlt> convertCoordinateListToLngLatList(List<Double> coordinateList) {
         List<LngLatAlt> lngLatAlts = new ArrayList<>();
