@@ -42,9 +42,9 @@
         <docker.maven.plugin.version>0.21.0</docker.maven.plugin.version>
         <spring-boot-plugin.version>1.5.6.RELEASE</spring-boot-plugin.version>
         <spring-boot.version>1.5.6.RELEASE</spring-boot.version>
-        <httpcomponents.version>4.5.1</httpcomponents.version>
+        <httpcomponents.version>4.5.2</httpcomponents.version>
         <assertj-core.version>3.3.0</assertj-core.version>
-        <camel-version>2.19.2</camel-version>
+        <camel-version>2.22.0</camel-version>
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
         <docker.from>eu.gcr.io/carbon-1287/java-base-image</docker.from>
         <fabric8.dockerUser>carbon-1287/</fabric8.dockerUser>
@@ -94,7 +94,7 @@
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>4.11</version>
+            <version>5.1</version>
         </dependency>
         <dependency>
             <groupId>org.entur.helpers</groupId>
@@ -183,7 +183,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.14</version>
+            <version>1.16</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -234,7 +234,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.9.39</version>
+            <version>1.11.161</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
