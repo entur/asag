@@ -42,7 +42,7 @@
         <docker.maven.plugin.version>0.21.0</docker.maven.plugin.version>
         <spring-boot-plugin.version>1.5.6.RELEASE</spring-boot-plugin.version>
         <spring-boot.version>1.5.6.RELEASE</spring-boot.version>
-        <httpcomponents.version>4.5.1</httpcomponents.version>
+        <httpcomponents.version>4.5.2</httpcomponents.version>
         <assertj-core.version>3.3.0</assertj-core.version>
         <camel-version>2.19.2</camel-version>
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
@@ -234,7 +234,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.9.39</version>
+            <version>1.11.371</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
