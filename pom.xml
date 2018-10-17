@@ -55,7 +55,7 @@
         <fabric8.label.group>quickstarts</fabric8.label.group>
         <fabric8.iconRef>camel</fabric8.iconRef>
         <netex-java-model.version>1.0.9-SNAPSHOT</netex-java-model.version>
-        <entur.helpers.version>0.0.3-SNAPSHOT</entur.helpers.version>
+        <entur.helpers.version>0.0.4-SNAPSHOT</entur.helpers.version>
         <fabric8.version>2.3.4</fabric8.version>
     </properties>
 
