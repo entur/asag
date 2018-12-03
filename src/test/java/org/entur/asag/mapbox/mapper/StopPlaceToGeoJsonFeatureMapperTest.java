@@ -15,20 +15,72 @@
 
 package org.entur.asag.mapbox.mapper;
 
+import org.entur.asag.netex.PublicationDeliveryHelper;
 import org.geojson.Feature;
 import org.junit.Test;
-import org.rutebanken.netex.model.*;
+import org.rutebanken.netex.model.AirSubmodeEnumeration;
+import org.rutebanken.netex.model.InterchangeWeightingEnumeration;
+import org.rutebanken.netex.model.KeyListStructure;
+import org.rutebanken.netex.model.KeyValueStructure;
+import org.rutebanken.netex.model.PublicationDeliveryStructure;
+import org.rutebanken.netex.model.SiteRefStructure;
+import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.StopTypeEnumeration;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.*;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.ADJACENT_SITES;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.FINAL_STOP_PLACE_TYPE;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.HAS_PARENT_SITE_REF;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.IS_PARENT_STOP_PLACE;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.IS_PRIMARY_ADJACENT_SITE;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.NETEX_IS_PARENT_STOP_PLACE;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.PUBLIC_CODE;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.STOP_PLACE_TYPE;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.SUBMODE;
+import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.WEIGHTING;
 
 public class StopPlaceToGeoJsonFeatureMapperTest {
 
     private ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper = new ZoneToGeoJsonFeatureMapper();
 
     private StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper = new StopPlaceToGeoJsonFeatureMapper(zoneToGeoJsonFeatureMapper);
+
+    @Test
+    public void testStopPlaceContainsMultipleAdjacentSites() throws Exception {
+        File initialFile = new File("src/test/resources/adjacent_sites_netex.xml");
+        InputStream targetStream = new FileInputStream(initialFile);
+
+        PublicationDeliveryStructure publicationDeliveryStructure = PublicationDeliveryHelper.unmarshall(targetStream);
+        Optional<StopPlace> first = PublicationDeliveryHelper.resolveStops(publicationDeliveryStructure).findFirst();
+
+        StopPlace stopPlace = first.get();
+
+        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
+
+        Map<String, Object> properties = feature.getProperties();
+
+        Set<String> result = new HashSet<>();
+        result.addAll((Collection<? extends String>) properties.get(ADJACENT_SITES));
+        assertThat(result).isNotEmpty();
+        assertThat(result).hasSize(3);
+        assertThat(result).contains("NSR:StopPlace:59880");
+        assertThat(properties.get(IS_PRIMARY_ADJACENT_SITE)).isEqualTo("false");
+        assertThat(properties.get(STOP_PLACE_TYPE)).isEqualTo(stopPlace.getStopPlaceType().value());
+        assertThat(properties.get(HAS_PARENT_SITE_REF)).isEqualTo("true");
+        assertThat(properties.get(IS_PARENT_STOP_PLACE)).isEqualTo("false");
+        assertThat(properties.get(WEIGHTING)).isEqualTo(stopPlace.getWeighting().value());
+        assertThat(feature.getProperties().get(PUBLIC_CODE)).isEqualTo(stopPlace.getPublicCode());
+
+    }
 
     @Test
     public void testMappingStopPlaceToGeojson() {

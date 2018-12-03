@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:ns2="http://www.opengis.net/gml/3.2" xmlns:ns3="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="43" xsi:schemaLocation="">
+  <PublicationTimestamp>2018-11-30T09:52:47.537</PublicationTimestamp>
+  <ParticipantRef>NSR</ParticipantRef>
+  <dataObjects>
+    <SiteFrame modification="new" version="1" id="NSR:SiteFrame:990315641">
+      <Description>Site frame ExportParams{topographicPlaceExportMode=NONE, municipalityReferences=[], countyReferences=[], stopPlaceSearch=StopPlaceSearch{q=NSR:StopPlace:59883, stopPlaceType=[], netexIdList=[], allVersions=false, withoutLocationOnly=false, withoutQuaysOnly=false, withDuplicatedQuayImportedIds=false, withTags=[], tags=[], page=0, size=20}, tariffZoneExportMode=NONE}</Description>
+      <FrameDefaults>
+        <DefaultLocale>
+          <TimeZone>Europe/Oslo</TimeZone>
+        </DefaultLocale>
+      </FrameDefaults>
+      <stopPlaces>
+        <StopPlace created="2018-11-30T09:40:02.419" changed="2018-11-30T09:44:05.973" modification="new" version="7" id="NSR:StopPlace:59881">
+          <keyList>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value/>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>false</Value>
+            </KeyValue>
+          </keyList>
+          <Name lang="nor">Test Bravo</Name>
+          <Description lang="nor"/>
+          <Centroid>
+            <Location>
+              <Longitude>10.957167</Longitude>
+              <Latitude>58.981227</Latitude>
+            </Location>
+          </Centroid>
+          <AccessibilityAssessment modification="new" version="5" id="NSR:AccessibilityAssessment:60526">
+            <MobilityImpairedAccess>unknown</MobilityImpairedAccess>
+            <limitations>
+              <AccessibilityLimitation modification="new" version="5" id="103898">
+                <WheelchairAccess>unknown</WheelchairAccess>
+                <StepFreeAccess>unknown</StepFreeAccess>
+                <EscalatorFreeAccess>unknown</EscalatorFreeAccess>
+                <LiftFreeAccess>unknown</LiftFreeAccess>
+                <AudibleSignalsAvailable>unknown</AudibleSignalsAvailable>
+              </AccessibilityLimitation>
+            </limitations>
+          </AccessibilityAssessment>
+          <TopographicPlaceRef ref="KVE:TopographicPlace:0111" created="2018-11-30T09:52:47.575"/>
+          <ParentSiteRef ref="NSR:StopPlace:59883" version="6"/>
+          <adjacentSites>
+            <SiteRef ref="NSR:StopPlace:59879"/>
+            <SiteRef ref="NSR:StopPlace:59884"/>
+            <SiteRef ref="NSR:StopPlace:59880"/>
+          </adjacentSites>
+          <TransportMode>rail</TransportMode>
+          <OtherTransportModes/>
+          <tariffZones>
+            <TariffZoneRef ref="OST:TariffZone:265"/>
+          </tariffZones>
+          <StopPlaceType>railStation</StopPlaceType>
+          <Weighting>interchangeAllowed</Weighting>
+        </StopPlace>
+        <StopPlace created="2018-11-30T09:40:50.953" changed="2018-11-30T09:44:05.973" modification="new" version="6" id="NSR:StopPlace:59883">
+          <ValidBetween>
+            <FromDate>2018-11-30T09:44:04</FromDate>
+          </ValidBetween>
+          <keyList>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value/>
+            </KeyValue>
+            <KeyValue>
+              <Key>CHANGED_BY</Key>
+              <Value>johan.wiklund-test</Value>
+            </KeyValue>
+            <KeyValue>
+              <Key>VERSION_COMMENT</Key>
+              <Value/>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>true</Value>
+            </KeyValue>
+          </keyList>
+          <Name lang="nor">Triangle</Name>
+          <Description lang="nor"/>
+          <Centroid>
+            <Location>
+              <Longitude>10.957344</Longitude>
+              <Latitude>58.981500</Latitude>
+            </Location>
+          </Centroid>
+          <TopographicPlaceRef ref="KVE:TopographicPlace:0111" created="2018-11-30T09:52:47.693"/>
+          <AirSubmode>unknown</AirSubmode>
+          <OtherTransportModes/>
+          <tariffZones>
+            <TariffZoneRef ref="OST:TariffZone:265"/>
+          </tariffZones>
+          <Weighting>interchangeAllowed</Weighting>
+        </StopPlace>
+        <StopPlace created="2018-11-30T09:40:17.217" changed="2018-11-30T09:44:05.973" modification="new" version="7" id="NSR:StopPlace:59879">
+          <keyList>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value/>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>false</Value>
+            </KeyValue>
+          </keyList>
+          <Name lang="nor">Test Charlie</Name>
+          <Description lang="nor"/>
+          <Centroid>
+            <Location>
+              <Longitude>10.957891</Longitude>
+              <Latitude>58.981594</Latitude>
+            </Location>
+          </Centroid>
+          <AccessibilityAssessment modification="new" version="5" id="NSR:AccessibilityAssessment:60525">
+            <MobilityImpairedAccess>unknown</MobilityImpairedAccess>
+            <limitations>
+              <AccessibilityLimitation modification="new" version="5" id="103899">
+                <WheelchairAccess>unknown</WheelchairAccess>
+                <StepFreeAccess>unknown</StepFreeAccess>
+                <EscalatorFreeAccess>unknown</EscalatorFreeAccess>
+                <LiftFreeAccess>unknown</LiftFreeAccess>
+                <AudibleSignalsAvailable>unknown</AudibleSignalsAvailable>
+              </AccessibilityLimitation>
+            </limitations>
+          </AccessibilityAssessment>
+          <TopographicPlaceRef ref="KVE:TopographicPlace:0111" created="2018-11-30T09:52:47.74"/>
+          <ParentSiteRef ref="NSR:StopPlace:59883" version="6"/>
+          <adjacentSites>
+            <SiteRef ref="NSR:StopPlace:59881"/>
+          </adjacentSites>
+          <TransportMode>water</TransportMode>
+          <OtherTransportModes/>
+          <tariffZones>
+            <TariffZoneRef ref="OST:TariffZone:265"/>
+          </tariffZones>
+          <StopPlaceType>ferryStop</StopPlaceType>
+          <Weighting>interchangeAllowed</Weighting>
+        </StopPlace>
+        <StopPlace created="2018-11-30T09:39:42.611" changed="2018-11-30T09:44:05.973" modification="new" version="8" id="NSR:StopPlace:59880">
+          <keyList>
+            <KeyValue>
+              <Key>imported-id</Key>
+              <Value/>
+            </KeyValue>
+            <KeyValue>
+              <Key>IS_PARENT_STOP_PLACE</Key>
+              <Value>false</Value>
+            </KeyValue>
+          </keyList>
+          <Name lang="nor">Test Alpha</Name>
+          <Description lang="nor"/>
+          <Centroid>
+            <Location>
+              <Longitude>10.956947</Longitude>
+              <Latitude>58.981708</Latitude>
+            </Location>
+          </Centroid>
+          <AccessibilityAssessment modification="new" version="7" id="NSR:AccessibilityAssessment:60524">
+            <MobilityImpairedAccess>unknown</MobilityImpairedAccess>
+            <limitations>
+              <AccessibilityLimitation modification="new" version="7" id="103900">
+                <WheelchairAccess>unknown</WheelchairAccess>
+                <StepFreeAccess>unknown</StepFreeAccess>
+                <EscalatorFreeAccess>unknown</EscalatorFreeAccess>
+                <LiftFreeAccess>unknown</LiftFreeAccess>
+                <AudibleSignalsAvailable>unknown</AudibleSignalsAvailable>
+              </AccessibilityLimitation>
+            </limitations>
+          </AccessibilityAssessment>
+          <TopographicPlaceRef ref="KVE:TopographicPlace:0111" created="2018-11-30T09:52:47.79"/>
+          <ParentSiteRef ref="NSR:StopPlace:59883" version="6"/>
+          <adjacentSites>
+            <SiteRef ref="NSR:StopPlace:59881"/>
+          </adjacentSites>
+          <TransportMode>bus</TransportMode>
+          <OtherTransportModes/>
+          <tariffZones>
+            <TariffZoneRef ref="OST:TariffZone:265"/>
+          </tariffZones>
+          <StopPlaceType>onstreetBus</StopPlaceType>
+          <Weighting>interchangeAllowed</Weighting>
+        </StopPlace>
+      </stopPlaces>
+    </SiteFrame>
+  </dataObjects>
+</PublicationDelivery>
