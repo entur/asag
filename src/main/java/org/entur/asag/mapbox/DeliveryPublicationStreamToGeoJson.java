@@ -68,7 +68,8 @@ public class DeliveryPublicationStreamToGeoJson {
     public DeliveryPublicationStreamToGeoJson(StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper,
                                               ParkingToGeoJsonFeatureMapper parkingToGeoJsonFeatureMapper,
                                               QuayToGeoJsonFeatureMapper quayToGeoJsonFeatureMapper,
-                                              TariffZoneToGeoJsonFeatureMapper tariffZoneToGeoJsonFeatureMapper, ValidityFilter validityFilter) throws JAXBException {
+                                              TariffZoneToGeoJsonFeatureMapper tariffZoneToGeoJsonFeatureMapper,
+                                              ValidityFilter validityFilter) throws JAXBException {
         this.stopPlaceToGeoJsonFeatureMapper = stopPlaceToGeoJsonFeatureMapper;
         this.parkingToGeoJsonFeatureMapper = parkingToGeoJsonFeatureMapper;
         this.quayToGeoJsonFeatureMapper = quayToGeoJsonFeatureMapper;
@@ -90,8 +91,6 @@ public class DeliveryPublicationStreamToGeoJson {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
 
-        AtomicInteger stopsCounter = new AtomicInteger();
-
         boolean lastWasMapped = false;
         try {
             writeFeatureCollectionStart(outputStreamWriter);
@@ -105,7 +104,12 @@ public class DeliveryPublicationStreamToGeoJson {
                     StartElement startElement = xmlEvent.asStartElement();
                     String localPartOfName = startElement.getName().getLocalPart();
                     if(mappableTypes.containsKey(localPartOfName)) {
-                        lastWasMapped = handle(localPartOfName, lastWasMapped, xmlEventReader, mappableTypes.get(localPartOfName) , outputStream, outputStreamWriter);
+                        lastWasMapped = handle(localPartOfName,
+                                lastWasMapped,
+                                xmlEventReader,
+                                mappableTypes.get(localPartOfName) ,
+                                outputStream,
+                                outputStreamWriter);
                     }
                 }
                 xmlEventReader.next();
@@ -119,7 +123,12 @@ public class DeliveryPublicationStreamToGeoJson {
         return outputStream;
     }
 
-    private <T extends EntityInVersionStructure> boolean handle(String localPartOfName, boolean lastWasMapped, XMLEventReader xmlEventReader, Class<T> clazz, OutputStream outputStream, OutputStreamWriter outputStreamWriter) throws IOException, JAXBException {
+    private <T extends EntityInVersionStructure> boolean handle(String localPartOfName,
+                                                                boolean lastWasMapped,
+                                                                XMLEventReader xmlEventReader,
+                                                                Class<T> clazz,
+                                                                OutputStream outputStream,
+                                                                OutputStreamWriter outputStreamWriter) throws IOException, JAXBException {
 
         if (clazz.getSimpleName().equals(localPartOfName)) {
             T unmarshalledEntity = unmarshaller.unmarshal(xmlEventReader, clazz).getValue();

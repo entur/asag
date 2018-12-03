@@ -38,6 +38,8 @@ import static org.entur.asag.mapbox.mapper.MapperHelper.*;
 @Service
 public class ZoneToGeoJsonFeatureMapper {
 
+    private static final Logger logger = LoggerFactory.getLogger(ZoneToGeoJsonFeatureMapper.class);
+
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
@@ -45,7 +47,6 @@ public class ZoneToGeoJsonFeatureMapper {
     public static final String PRIVATE_CODE = "privateCode";
     public static final String CODE_SPACE = "codeSpace";
 
-    private static final Logger logger = LoggerFactory.getLogger(ZoneToGeoJsonFeatureMapper.class);
 
     public Feature mapZoneToGeoJson(Zone_VersionStructure zone) {
 
