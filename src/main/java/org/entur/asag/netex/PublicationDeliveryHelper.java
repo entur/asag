@@ -15,11 +15,7 @@
 
 package org.entur.asag.netex;
 
-import org.entur.asag.mapbox.mapper.MapperHelper;
-import org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper;
 import org.rutebanken.netex.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -27,15 +23,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static javax.xml.bind.JAXBContext.newInstance;
@@ -44,9 +33,6 @@ import static javax.xml.bind.JAXBContext.newInstance;
  * Common useful methods for resolving parts of NeTEx
  */
 public class PublicationDeliveryHelper {
-
-    private static final Logger logger = LoggerFactory.getLogger(PublicationDeliveryHelper.class);
-
 
     public static Stream<StopPlace> resolveStops(PublicationDeliveryStructure publicationDelivery) {
 
@@ -57,20 +43,6 @@ public class PublicationDeliveryHelper {
                 .map(StopPlacesInFrame_RelStructure::getStopPlace)
                 .filter(Objects::nonNull)
                 .flatMap(Collection::stream);
-    }
-
-    public static TreeSet<String> resolveAdjacentSites(StopPlace stopPlace) {
-        TreeSet<String> siteRefs = new TreeSet<>(String::compareToIgnoreCase);
-        Optional<SiteRefs_RelStructure> adjacentSites = Optional.ofNullable(stopPlace.getAdjacentSites());
-
-        adjacentSites.ifPresent(adjacentSite -> {
-            Set<String> collect = adjacentSite.getSiteRef().stream()
-                    .map(s -> s.getValue().getRef())
-                    .collect(Collectors.toSet());
-            siteRefs.addAll(collect);
-
-        });
-        return siteRefs;
     }
 
     public static Stream<SiteFrame> resolveSiteFrames(PublicationDeliveryStructure publicationDeliveryStructure) {
@@ -99,27 +71,5 @@ public class PublicationDeliveryHelper {
     public static Unmarshaller createUnmarshaller() throws JAXBException {
         JAXBContext publicationDeliveryContext = newInstance(PublicationDeliveryStructure.class);
         return publicationDeliveryContext.createUnmarshaller();
-    }
-
-    public static Optional<String> resolveFirstSubmodeToSingleValue(StopPlace stopPlace) {
-        return Arrays.stream(StopPlace_VersionStructure.class.getDeclaredMethods())
-                .filter(method -> method.getName().startsWith("get") && method.getName().endsWith("Submode"))
-                .map(method -> safeInvoke(method, stopPlace))
-                .filter(Objects::nonNull)
-                .map(MapperHelper::getEnumValue)
-                .filter(Objects::nonNull)
-                .map(String::valueOf)
-                .filter(value -> !"unknown".equals(value))
-                .findAny();
-    }
-
-
-    private static Object safeInvoke(Method method, StopPlace stopPlace) {
-        try {
-            return method.invoke(stopPlace);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            logger.warn("Error resolving submode from stop place {}. Ignoring this method: {}", stopPlace.getId(), method.getName(), e);
-        }
-        return null;
     }
 }

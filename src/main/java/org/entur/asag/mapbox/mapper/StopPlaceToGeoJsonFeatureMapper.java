@@ -15,14 +15,19 @@
 
 package org.entur.asag.mapbox.mapper;
 
-import org.entur.asag.netex.PublicationDeliveryHelper;
 import org.geojson.Feature;
+import org.rutebanken.netex.model.SiteRefs_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.StopPlace_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -49,6 +54,7 @@ public class StopPlaceToGeoJsonFeatureMapper {
     static final String IS_PARENT_STOP_PLACE = "isParentStopPlace";
     static final String ADJACENT_SITES = "adjacentSites";
     static final String IS_PRIMARY_ADJACENT_SITE = "isPrimaryAdjacentSite";
+    private static final Logger logger = LoggerFactory.getLogger(StopPlaceToGeoJsonFeatureMapper.class);
     private final ZoneToGeoJsonFeatureMapper zoneToGeoJsonFeatureMapper;
 
     @Autowired
@@ -56,11 +62,11 @@ public class StopPlaceToGeoJsonFeatureMapper {
         this.zoneToGeoJsonFeatureMapper = zoneToGeoJsonFeatureMapper;
     }
 
-    public Feature mapStopPlaceToGeoJson(StopPlace stopPlace, Set<String> adjacentStopType) {
+    public Feature mapStopPlaceToGeoJson(StopPlace stopPlace) {
         Feature feature = zoneToGeoJsonFeatureMapper.mapZoneToGeoJson(stopPlace);
 
-        Optional<String> optionalSubmode = PublicationDeliveryHelper.resolveFirstSubmodeToSingleValue(stopPlace);
-        TreeSet<String> optionalAdjacentSites = PublicationDeliveryHelper.resolveAdjacentSites(stopPlace);
+        Optional<String> optionalSubmode = resolveFirstSubmodeToSingleValue(stopPlace);
+        TreeSet<String> optionalAdjacentSites = resolveAdjacentSites(stopPlace);
 
         optionalSubmode.ifPresent(submode -> {
             feature.setProperty(SUBMODE, submode);
@@ -83,20 +89,47 @@ public class StopPlaceToGeoJsonFeatureMapper {
             feature.setProperty(ADJACENT_SITES, optionalAdjacentSites);
             boolean isPrimaryAdjacent = optionalAdjacentSites.higher(stopPlace.getId()) == null ? true : false;
             feature.setProperty(IS_PRIMARY_ADJACENT_SITE, String.valueOf(isPrimaryAdjacent));
-
-            if (isPrimaryAdjacent) {
-                Optional<String> finalStopType = getFinalStopType(stopPlace.getStopPlaceType().value(), adjacentStopType);
-                finalStopType.ifPresent( final_stop_place_type -> feature.setProperty(FINAL_STOP_PLACE_TYPE, final_stop_place_type));
-            }
         }
 
         return feature;
 
     }
 
-    private Optional<String> getFinalStopType(String stopPlaceType, Set<String> adjacentStopTypes ) {
-        adjacentStopTypes.add(stopPlaceType);
-        String final_stop_place_type = adjacentStopTypes.stream().sorted().collect(Collectors.joining("_"));
-        return Optional.of(final_stop_place_type);
+    private TreeSet<String> resolveAdjacentSites(StopPlace stopPlace) {
+        TreeSet<String> siteRefs = new TreeSet<>(String::compareToIgnoreCase);
+        Optional<SiteRefs_RelStructure> adjacentSites = Optional.ofNullable(stopPlace.getAdjacentSites());
+
+        adjacentSites.ifPresent(adjacentSite -> {
+            Set<String> collect = adjacentSite.getSiteRef().stream()
+                    .map(s -> s.getValue().getRef())
+                    .collect(Collectors.toSet());
+            siteRefs.addAll(collect);
+
+        });
+        return siteRefs;
     }
+
+    private Optional<String> resolveFirstSubmodeToSingleValue(StopPlace stopPlace) {
+        return Arrays.stream(StopPlace_VersionStructure.class.getDeclaredMethods())
+                .filter(method -> method.getName().startsWith("get") && method.getName().endsWith("Submode"))
+                .map(method -> safeInvoke(method, stopPlace))
+                .filter(Objects::nonNull)
+                .map(MapperHelper::getEnumValue)
+                .filter(Objects::nonNull)
+                .map(String::valueOf)
+                .filter(value -> !"unknown".equals(value))
+                .findAny();
+    }
+
+
+    private Object safeInvoke(Method method, StopPlace stopPlace) {
+        try {
+            return method.invoke(stopPlace);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            logger.warn("Error resolving submode from stop place {}. Ignoring this method: {}", stopPlace.getId(), method.getName(), e);
+        }
+        return null;
+    }
+
+
 }
