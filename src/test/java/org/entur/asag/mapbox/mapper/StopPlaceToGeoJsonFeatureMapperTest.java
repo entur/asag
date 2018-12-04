@@ -19,6 +19,7 @@ import org.entur.asag.netex.PublicationDeliveryHelper;
 import org.geojson.Feature;
 import org.junit.Test;
 import org.rutebanken.netex.model.AirSubmodeEnumeration;
+import org.rutebanken.netex.model.EntityStructure;
 import org.rutebanken.netex.model.InterchangeWeightingEnumeration;
 import org.rutebanken.netex.model.KeyListStructure;
 import org.rutebanken.netex.model.KeyValueStructure;
@@ -35,6 +36,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper.ADJACENT_SITES;
@@ -60,20 +62,33 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
         InputStream targetStream = new FileInputStream(initialFile);
 
         PublicationDeliveryStructure publicationDeliveryStructure = PublicationDeliveryHelper.unmarshall(targetStream);
+        Map<String, String> stopPlaceType = PublicationDeliveryHelper.resolveStops(publicationDeliveryStructure)
+                .filter(p -> p.getStopPlaceType() !=null)
+                .collect(Collectors.toMap(EntityStructure::getId, s -> s.getStopPlaceType().value()));
+
         Optional<StopPlace> first = PublicationDeliveryHelper.resolveStops(publicationDeliveryStructure).findFirst();
 
         StopPlace stopPlace = first.get();
 
-        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
+        Set<String> adjacentSites = PublicationDeliveryHelper.resolveAdjacentSites(stopPlace);
+        Set<String> adjacentSitesTypes = new HashSet<>();
+        if (!adjacentSites.isEmpty()) {
+            for (String siteRef : adjacentSites) {
+                String adjacentSiteType = stopPlaceType.get(siteRef);
+                adjacentSitesTypes.add(adjacentSiteType);
+
+            }
+        }
+        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace, adjacentSitesTypes);
 
         Map<String, Object> properties = feature.getProperties();
 
         Set<String> result = new HashSet<>();
         result.addAll((Collection<? extends String>) properties.get(ADJACENT_SITES));
         assertThat(result).isNotEmpty();
-        assertThat(result).hasSize(3);
+        assertThat(result).hasSize(2);
         assertThat(result).contains("NSR:StopPlace:59880");
-        assertThat(properties.get(IS_PRIMARY_ADJACENT_SITE)).isEqualTo("false");
+        assertThat(properties.get(IS_PRIMARY_ADJACENT_SITE)).isEqualTo("true");
         assertThat(properties.get(STOP_PLACE_TYPE)).isEqualTo(stopPlace.getStopPlaceType().value());
         assertThat(properties.get(HAS_PARENT_SITE_REF)).isEqualTo("true");
         assertThat(properties.get(IS_PARENT_STOP_PLACE)).isEqualTo("false");
@@ -100,7 +115,8 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
                         .withVersion("2"));
 
 
-        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
+        Set<String> adjacentSites = new HashSet<>();
+        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace, adjacentSites);
 
         Map<String, Object> properties = feature.getProperties();
 
@@ -120,7 +136,8 @@ public class StopPlaceToGeoJsonFeatureMapperTest {
                 .withId("NSR:StopPlace:1")
                 .withStopPlaceType(StopTypeEnumeration.BUS_STATION);
 
-        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
+        Set<String> adjacentSites = new HashSet<>();
+        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace, adjacentSites);
 
         Map<String, Object> properties = feature.getProperties();
 

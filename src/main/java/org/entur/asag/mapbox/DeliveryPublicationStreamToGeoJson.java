@@ -16,6 +16,7 @@
 package org.entur.asag.mapbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
 import org.entur.asag.mapbox.filter.ValidityFilter;
 import org.entur.asag.mapbox.mapper.ParkingToGeoJsonFeatureMapper;
 import org.entur.asag.mapbox.mapper.QuayToGeoJsonFeatureMapper;
@@ -23,7 +24,13 @@ import org.entur.asag.mapbox.mapper.StopPlaceToGeoJsonFeatureMapper;
 import org.entur.asag.mapbox.mapper.TariffZoneToGeoJsonFeatureMapper;
 import org.entur.asag.netex.PublicationDeliveryHelper;
 import org.geojson.Feature;
-import org.rutebanken.netex.model.*;
+import org.rutebanken.netex.model.EntityInVersionStructure;
+import org.rutebanken.netex.model.EntityStructure;
+import org.rutebanken.netex.model.Parking;
+import org.rutebanken.netex.model.PublicationDeliveryStructure;
+import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.TariffZone;
+import org.rutebanken.netex.model.Zone_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +42,20 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class DeliveryPublicationStreamToGeoJson {
@@ -54,15 +71,11 @@ public class DeliveryPublicationStreamToGeoJson {
     private final TariffZoneToGeoJsonFeatureMapper tariffZoneToGeoJsonFeatureMapper;
 
     private final ValidityFilter validityFilter;
-
-
-    private ObjectMapper jacksonObjectMapper = new ObjectMapper();
-
-    private Map<Class, AtomicInteger> incrementorsByType = new HashMap<>();
-
-    private Map<String, Class<? extends EntityInVersionStructure>> mappableTypes = new HashMap<>();
-
     private final Unmarshaller unmarshaller;
+    private ObjectMapper jacksonObjectMapper = new ObjectMapper();
+    private Map<Class, AtomicInteger> incrementorsByType = new HashMap<>();
+    private Map<String, Class<? extends EntityInVersionStructure>> mappableTypes = new HashMap<>();
+    private Map<String, String> stopPlaceTransportType;
 
     @Autowired
     public DeliveryPublicationStreamToGeoJson(StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper,
@@ -93,9 +106,20 @@ public class DeliveryPublicationStreamToGeoJson {
 
         boolean lastWasMapped = false;
         try {
+
+            ByteArrayOutputStream boas = new ByteArrayOutputStream();
+            IOUtils.copy(publicationDeliveryStream,boas);
+            byte[] bytes = boas.toByteArray();
+
             writeFeatureCollectionStart(outputStreamWriter);
 
-            XMLEventReader xmlEventReader = XMLInputFactory.newInstance().createXMLEventReader(publicationDeliveryStream);
+
+            PublicationDeliveryStructure publicationDeliveryStructure = PublicationDeliveryHelper.unmarshall(new ByteArrayInputStream(bytes));
+            stopPlaceTransportType = PublicationDeliveryHelper.resolveStops(publicationDeliveryStructure)
+                    .filter(p -> p.getStopPlaceType() !=null)
+                    .collect(Collectors.toMap(stopPlace -> stopPlace.getId(), stopPlace -> getStopType(stopPlace)));
+
+            XMLEventReader xmlEventReader = XMLInputFactory.newInstance().createXMLEventReader(new ByteArrayInputStream(bytes));
 
             while (xmlEventReader.hasNext()) {
                 XMLEvent xmlEvent = xmlEventReader.peek();
@@ -103,11 +127,11 @@ public class DeliveryPublicationStreamToGeoJson {
                 if (xmlEvent.isStartElement()) {
                     StartElement startElement = xmlEvent.asStartElement();
                     String localPartOfName = startElement.getName().getLocalPart();
-                    if(mappableTypes.containsKey(localPartOfName)) {
+                    if (mappableTypes.containsKey(localPartOfName)) {
                         lastWasMapped = handle(localPartOfName,
                                 lastWasMapped,
                                 xmlEventReader,
-                                mappableTypes.get(localPartOfName) ,
+                                mappableTypes.get(localPartOfName),
                                 outputStream,
                                 outputStreamWriter);
                     }
@@ -123,6 +147,17 @@ public class DeliveryPublicationStreamToGeoJson {
         return outputStream;
     }
 
+    private String getStopType(StopPlace stopPlace) {
+        Optional<String> optionalSubmode = PublicationDeliveryHelper.resolveFirstSubmodeToSingleValue(stopPlace);
+
+            if (!optionalSubmode.isPresent()) {
+                return stopPlace.getStopPlaceType().value();
+            } else {
+                return optionalSubmode.get();
+            }
+
+    }
+
     private <T extends EntityInVersionStructure> boolean handle(String localPartOfName,
                                                                 boolean lastWasMapped,
                                                                 XMLEventReader xmlEventReader,
@@ -134,9 +169,9 @@ public class DeliveryPublicationStreamToGeoJson {
             T unmarshalledEntity = unmarshaller.unmarshal(xmlEventReader, clazz).getValue();
             if (validityFilter.isValidNow(unmarshalledEntity.getValidBetween())) {
 
-                if(unmarshalledEntity instanceof Zone_VersionStructure) {
+                if (unmarshalledEntity instanceof Zone_VersionStructure) {
                     Zone_VersionStructure zone = (Zone_VersionStructure) unmarshalledEntity;
-                    if(zone.getPolygon() == null && zone.getCentroid() == null) {
+                    if (zone.getPolygon() == null && zone.getCentroid() == null) {
                         logger.warn("Got zone ({}) without centroid and polygon. Ignoring it.", zone.getId());
                         return lastWasMapped;
                     }
@@ -147,11 +182,21 @@ public class DeliveryPublicationStreamToGeoJson {
                     writeComma(outputStreamWriter);
                 }
 
-                if(StopPlace.class.isAssignableFrom(clazz)) {
-                    writeStop((StopPlace) unmarshalledEntity, outputStream, outputStreamWriter);
-                } else if(Parking.class.isAssignableFrom(clazz)) {
+                if (StopPlace.class.isAssignableFrom(clazz)) {
+                    StopPlace stopPlace = (StopPlace) unmarshalledEntity;
+                    TreeSet<String> adjacentSites = PublicationDeliveryHelper.resolveAdjacentSites(stopPlace);
+                    Set<String> adjacentSitesTypes = new HashSet<>();
+                    if (!adjacentSites.isEmpty()) {
+                        for (String siteRef : adjacentSites) {
+                            String adjacentSiteType = stopPlaceTransportType.get(siteRef);
+                            adjacentSitesTypes.add(adjacentSiteType);
+
+                        }
+                    }
+                    writeStop(stopPlace, adjacentSitesTypes, outputStream, outputStreamWriter);
+                } else if (Parking.class.isAssignableFrom(clazz)) {
                     writeParking((Parking) unmarshalledEntity, outputStream);
-                } else if(TariffZone.class.isAssignableFrom(clazz)) {
+                } else if (TariffZone.class.isAssignableFrom(clazz)) {
                     writeTariffZone((TariffZone) unmarshalledEntity, outputStream, outputStreamWriter);
                 }
 
@@ -171,11 +216,11 @@ public class DeliveryPublicationStreamToGeoJson {
         jacksonObjectMapper.writeValue(outputStream, feature);
     }
 
-    private void writeStop(StopPlace stopPlace, OutputStream outputStream, OutputStreamWriter outputStreamWriter) throws IOException {
-        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
+    private void writeStop(StopPlace stopPlace, Set<String> adjacentStopType, OutputStream outputStream, OutputStreamWriter outputStreamWriter) throws IOException {
+        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace , adjacentStopType);
         jacksonObjectMapper.writeValue(outputStream, feature);
 
-        for(Feature quayFeature : quayToGeoJsonFeatureMapper.mapQuaysToGeojsonFeatures(stopPlace.getQuays())) {
+        for (Feature quayFeature : quayToGeoJsonFeatureMapper.mapQuaysToGeojsonFeatures(stopPlace.getQuays())) {
             writeComma(outputStreamWriter);
             jacksonObjectMapper.writeValue(outputStream, quayFeature);
         }
