@@ -37,7 +37,10 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -64,6 +67,11 @@ public class DeliveryPublicationStreamToGeoJson {
 
     private final Unmarshaller unmarshaller;
 
+    private Set<StopPlace> stopPlaces;
+    private Set<Parking> parkings;
+    private Set<TariffZone> tariffZones;
+    private HashMap<String,String> stopPlaceTypes;
+
     @Autowired
     public DeliveryPublicationStreamToGeoJson(StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper,
                                               ParkingToGeoJsonFeatureMapper parkingToGeoJsonFeatureMapper,
@@ -76,6 +84,9 @@ public class DeliveryPublicationStreamToGeoJson {
         this.tariffZoneToGeoJsonFeatureMapper = tariffZoneToGeoJsonFeatureMapper;
         this.validityFilter = validityFilter;
         unmarshaller = PublicationDeliveryHelper.createUnmarshaller();
+        this.stopPlaces = new HashSet<>();
+        this.parkings = new HashSet<>();
+        this.tariffZones = new HashSet<>();
 
         mappableTypes.put("StopPlace", StopPlace.class);
         mappableTypes.put("Parking", Parking.class);
@@ -88,12 +99,8 @@ public class DeliveryPublicationStreamToGeoJson {
 
     private OutputStream traverse(InputStream publicationDeliveryStream) {
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
-
         boolean lastWasMapped = false;
         try {
-            writeFeatureCollectionStart(outputStreamWriter);
 
             XMLEventReader xmlEventReader = XMLInputFactory.newInstance().createXMLEventReader(publicationDeliveryStream);
 
@@ -107,28 +114,76 @@ public class DeliveryPublicationStreamToGeoJson {
                         lastWasMapped = handle(localPartOfName,
                                 lastWasMapped,
                                 xmlEventReader,
-                                mappableTypes.get(localPartOfName) ,
-                                outputStream,
-                                outputStreamWriter);
+                                mappableTypes.get(localPartOfName));
                     }
                 }
                 xmlEventReader.next();
             }
 
-            writeFeatureCollectionEnd(outputStreamWriter);
 
         } catch (Exception e) {
             throw new RuntimeException("Parsing of DeliveryPublications failed: " + e.getMessage(), e);
         }
+        return writeGeoJson();
+    }
+
+    private OutputStream writeGeoJson() {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
+
+        try {
+            // Start of geoJson file
+            writeFeatureCollectionStart(outputStreamWriter);
+
+
+            //Write all stops
+            Iterator<StopPlace> stopPlaceIterator = stopPlaces.iterator();
+            while (stopPlaceIterator.hasNext()) {
+                writeStop(stopPlaceIterator.next(),outputStream,outputStreamWriter);
+                if (stopPlaceIterator.hasNext()) {
+                    writeComma(outputStreamWriter);
+                }
+            }
+
+            if (!parkings.isEmpty()) {
+                writeComma(outputStreamWriter);
+            }
+            //Write all parkings
+            Iterator<Parking> parkingIterator = parkings.iterator();
+            while (parkingIterator.hasNext()) {
+                writeParking(parkingIterator.next(), outputStream);
+                if (parkingIterator.hasNext()) {
+                    writeComma(outputStreamWriter);
+                }
+            }
+
+            //Write all traffizones
+            if (!tariffZones.isEmpty()) {
+                writeComma(outputStreamWriter);
+            }
+
+            Iterator<TariffZone> tariffZoneIterator = tariffZones.iterator();
+            while (tariffZoneIterator.hasNext()) {
+                writeTariffZone(tariffZoneIterator.next(), outputStream);
+                if (tariffZoneIterator.hasNext()) {
+                    writeComma(outputStreamWriter);
+                }
+            }
+            //End of geoJson file
+            writeFeatureCollectionEnd(outputStreamWriter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
         return outputStream;
     }
 
     private <T extends EntityInVersionStructure> boolean handle(String localPartOfName,
                                                                 boolean lastWasMapped,
                                                                 XMLEventReader xmlEventReader,
-                                                                Class<T> clazz,
-                                                                OutputStream outputStream,
-                                                                OutputStreamWriter outputStreamWriter) throws IOException, JAXBException {
+                                                                Class<T> clazz) throws JAXBException {
 
         if (clazz.getSimpleName().equals(localPartOfName)) {
             T unmarshalledEntity = unmarshaller.unmarshal(xmlEventReader, clazz).getValue();
@@ -142,19 +197,16 @@ public class DeliveryPublicationStreamToGeoJson {
                     }
                 }
 
-
-                if (lastWasMapped) {
-                    writeComma(outputStreamWriter);
-                }
-
                 if(StopPlace.class.isAssignableFrom(clazz)) {
-                    writeStop((StopPlace) unmarshalledEntity, outputStream, outputStreamWriter);
+                    StopPlace stopPlace = (StopPlace) unmarshalledEntity;
+                    stopPlaces.add(stopPlace);
                 } else if(Parking.class.isAssignableFrom(clazz)) {
-                    writeParking((Parking) unmarshalledEntity, outputStream);
+                    Parking parking = (Parking) unmarshalledEntity;
+                    parkings.add(parking);
                 } else if(TariffZone.class.isAssignableFrom(clazz)) {
-                    writeTariffZone((TariffZone) unmarshalledEntity, outputStream, outputStreamWriter);
+                    TariffZone tariffZone = (TariffZone) unmarshalledEntity;
+                    tariffZones.add(tariffZone);
                 }
-
 
                 AtomicInteger counter = incrementorsByType.computeIfAbsent(clazz, key -> new AtomicInteger());
                 counter.incrementAndGet();
@@ -181,7 +233,7 @@ public class DeliveryPublicationStreamToGeoJson {
         }
     }
 
-    private void writeTariffZone(TariffZone tariffZone, OutputStream outputStream, OutputStreamWriter outputStreamWriter) throws IOException {
+    private void writeTariffZone(TariffZone tariffZone, OutputStream outputStream) throws IOException {
         Feature feature = tariffZoneToGeoJsonFeatureMapper.mapTariffZoneToGeoJson(tariffZone);
         jacksonObjectMapper.writeValue(outputStream, feature);
     }

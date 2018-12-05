@@ -68,7 +68,7 @@ public class DeliveryPublicationStreamToGeoJsonTest {
         assertThat(featureCollection.getFeatures())
                 .isNotEmpty()
                 .extracting(Feature::getId)
-                .containsExactly("NSR:StopPlace:1", "NSR:StopPlace:10", "NSR:Quay:8", "NSR:Parking:99", "VKT:TariffZone:729");
+                .contains("NSR:StopPlace:1", "NSR:StopPlace:10", "NSR:Quay:8", "NSR:Parking:99", "VKT:TariffZone:729", "VKT:TariffZone:730");
 
         System.out.println(featureCollection);
 
