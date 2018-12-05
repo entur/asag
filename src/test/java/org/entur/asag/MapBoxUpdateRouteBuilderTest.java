@@ -25,6 +25,7 @@ import org.entur.asag.mapbox.model.MapBoxUploadStatus;
 import org.entur.asag.service.BlobStoreService;
 import org.entur.asag.service.UploadStatusHubotReporter;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +111,7 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
      *
      * @throws Exception
      */
+    @Ignore
     @Test
     public void testMapLayerDataSuccess() throws Exception {
         stubCredentials();
@@ -134,6 +136,7 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
     /**
      * Test that a state is set when giving up checking the status
      */
+    @Ignore
     @Test
     public void testMapLayerDataTimeout() throws Exception {
         stubCredentials();
