@@ -156,7 +156,7 @@ public class DeliveryPublicationStreamToGeoJson {
                     }
                     adjacentSitesTypes.add(getStopPlaceType(stopPlace));
                 }
-                String final_stop_type = adjacentSitesTypes.stream().collect(Collectors.joining("_"));
+                String final_stop_type = adjacentSitesTypes.stream().sorted().collect(Collectors.joining("_"));
                 writeStop(stopPlace,final_stop_type, outputStream,outputStreamWriter);
                 if (stopPlaceIterator.hasNext()) {
                     writeComma(outputStreamWriter);
