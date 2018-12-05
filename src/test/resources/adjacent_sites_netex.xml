@@ -46,7 +46,6 @@
           <ParentSiteRef ref="NSR:StopPlace:59883" version="6"/>
           <adjacentSites>
             <SiteRef ref="NSR:StopPlace:59879"/>
-            <SiteRef ref="NSR:StopPlace:59884"/>
             <SiteRef ref="NSR:StopPlace:59880"/>
           </adjacentSites>
           <TransportMode>rail</TransportMode>

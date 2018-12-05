@@ -40,8 +40,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class DeliveryPublicationStreamToGeoJson {
@@ -70,7 +73,7 @@ public class DeliveryPublicationStreamToGeoJson {
     private Set<StopPlace> stopPlaces;
     private Set<Parking> parkings;
     private Set<TariffZone> tariffZones;
-    private HashMap<String,String> stopPlaceTypes;
+    private Map<String, String> stopPlaceTypes;
 
     @Autowired
     public DeliveryPublicationStreamToGeoJson(StopPlaceToGeoJsonFeatureMapper stopPlaceToGeoJsonFeatureMapper,
@@ -88,6 +91,7 @@ public class DeliveryPublicationStreamToGeoJson {
         this.parkings = new HashSet<>();
         this.tariffZones = new HashSet<>();
 
+        this.stopPlaceTypes = new HashMap<>();
         mappableTypes.put("StopPlace", StopPlace.class);
         mappableTypes.put("Parking", Parking.class);
         mappableTypes.put("TariffZone", TariffZone.class);
@@ -128,6 +132,8 @@ public class DeliveryPublicationStreamToGeoJson {
     }
 
     private OutputStream writeGeoJson() {
+        stopPlaceTypes.putAll(stopPlaces.stream().collect(Collectors.toMap(stopPlace -> stopPlace.getId(), stopPlace -> getStopPlaceType(stopPlace))));
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
 
@@ -139,7 +145,19 @@ public class DeliveryPublicationStreamToGeoJson {
             //Write all stops
             Iterator<StopPlace> stopPlaceIterator = stopPlaces.iterator();
             while (stopPlaceIterator.hasNext()) {
-                writeStop(stopPlaceIterator.next(),outputStream,outputStreamWriter);
+                StopPlace stopPlace = stopPlaceIterator.next();
+                TreeSet<String> adjacentSites = PublicationDeliveryHelper.resolveAdjacentSites(stopPlace);
+                Set<String> adjacentSitesTypes = new HashSet<>();
+                if (!adjacentSites.isEmpty()) {
+                    for (String siteRef : adjacentSites) {
+                        String adjacentSiteType = stopPlaceTypes.get(siteRef);
+                        adjacentSitesTypes.add(adjacentSiteType);
+
+                    }
+                    adjacentSitesTypes.add(getStopPlaceType(stopPlace));
+                }
+                String final_stop_type = adjacentSitesTypes.stream().collect(Collectors.joining("_"));
+                writeStop(stopPlace,final_stop_type, outputStream,outputStreamWriter);
                 if (stopPlaceIterator.hasNext()) {
                     writeComma(outputStreamWriter);
                 }
@@ -178,6 +196,21 @@ public class DeliveryPublicationStreamToGeoJson {
 
 
         return outputStream;
+    }
+
+    private String getStopPlaceType(StopPlace stopPlace) {
+            Optional<String> optionalSubmode = PublicationDeliveryHelper.resolveFirstSubmodeToSingleValue(stopPlace);
+
+            if (!optionalSubmode.isPresent()) {
+                if (stopPlace.getStopPlaceType() != null) {
+                    return stopPlace.getStopPlaceType().value();
+                } else {
+                    return "unknown";
+                }
+            } else {
+                return optionalSubmode.get();
+            }
+
     }
 
     private <T extends EntityInVersionStructure> boolean handle(String localPartOfName,
@@ -223,8 +256,8 @@ public class DeliveryPublicationStreamToGeoJson {
         jacksonObjectMapper.writeValue(outputStream, feature);
     }
 
-    private void writeStop(StopPlace stopPlace, OutputStream outputStream, OutputStreamWriter outputStreamWriter) throws IOException {
-        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace);
+    private void writeStop(StopPlace stopPlace,String finalStopPlaceType, OutputStream outputStream, OutputStreamWriter outputStreamWriter) throws IOException {
+        Feature feature = stopPlaceToGeoJsonFeatureMapper.mapStopPlaceToGeoJson(stopPlace, finalStopPlaceType);
         jacksonObjectMapper.writeValue(outputStream, feature);
 
         for(Feature quayFeature : quayToGeoJsonFeatureMapper.mapQuaysToGeojsonFeatures(stopPlace.getQuays())) {
