@@ -21,9 +21,10 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spring.boot.CamelSpringBootApplicationController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
@@ -38,9 +39,9 @@ public class AsagApp extends RouteBuilder {
     public static void main(String... args) throws Exception {
         logger.info("Starting Asag ...");
 
-        SpringApplication springApplication = new SpringApplication(AsagApp.class);
-        springApplication.setWebEnvironment(false);
-        ApplicationContext applicationContext = springApplication.run(args);
+        ConfigurableApplicationContext applicationContext = new SpringApplicationBuilder(AsagApp.class)
+                .web(WebApplicationType.NONE)
+                .run(args);
 
         CamelSpringBootApplicationController applicationController = applicationContext.getBean(CamelSpringBootApplicationController.class);
 
