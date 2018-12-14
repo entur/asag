@@ -42,7 +42,7 @@
         <assertj-core.version>3.3.0</assertj-core.version>
         <camel-version>2.22.2</camel-version>
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
-        <docker.from>eu.gcr.io/carbon-1287/java-base-image</docker.from>
+        <docker.from>eu.gcr.io/carbon-1287/openjdk11-base-image</docker.from>
         <fabric8.dockerUser>carbon-1287/</fabric8.dockerUser>
         <docker.image>eu.gcr.io/${fabric8.dockerUser}${project.artifactId}:%l</docker.image>
         <docker.cleanup>none</docker.cleanup>
