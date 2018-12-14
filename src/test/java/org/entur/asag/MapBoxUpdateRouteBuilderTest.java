@@ -21,17 +21,16 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.model.ModelCamelContext;
 import org.entur.asag.mapbox.MapBoxUpdateRouteBuilder;
-import org.entur.asag.mapbox.model.MapBoxUploadStatus;
 import org.entur.asag.service.BlobStoreService;
 import org.entur.asag.service.UploadStatusHubotReporter;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,10 +38,9 @@ import java.io.FileInputStream;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.entur.asag.mapbox.MapBoxUpdateRouteBuilder.*;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(classes = MapBoxUpdateRouteBuilder.class,
         properties = {
                 "spring.main.sources=org.entur.asag",
@@ -111,7 +109,7 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
      *
      * @throws Exception
      */
-    @Ignore
+
     @Test
     public void testMapLayerDataSuccess() throws Exception {
         stubCredentials();
@@ -136,7 +134,7 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
     /**
      * Test that a state is set when giving up checking the status
      */
-    @Ignore
+
     @Test
     public void testMapLayerDataTimeout() throws Exception {
         stubCredentials();
