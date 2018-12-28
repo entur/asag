@@ -79,12 +79,12 @@
         <dependency>
             <groupId>de.grundid.opendatalab</groupId>
             <artifactId>geojson-jackson</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
         </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>4.11</version>
+            <version>5.0</version>
         </dependency>
         <dependency>
             <groupId>org.entur.helpers</groupId>
@@ -234,7 +234,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.9.39</version>
+            <version>1.11.453</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
