@@ -38,9 +38,9 @@
         <docker.maven.plugin.version>0.21.0</docker.maven.plugin.version>
         <spring-boot-plugin.version>2.1.1.RELEASE</spring-boot-plugin.version>
         <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
-        <httpcomponents.version>4.5.1</httpcomponents.version>
+        <httpcomponents.version>4.5.2</httpcomponents.version>
         <assertj-core.version>3.3.0</assertj-core.version>
-        <camel-version>2.22.2</camel-version>
+        <camel-version>2.22.3</camel-version>
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
         <docker.from>eu.gcr.io/carbon-1287/openjdk11-base-image</docker.from>
         <fabric8.dockerUser>carbon-1287/</fabric8.dockerUser>
@@ -79,12 +79,12 @@
         <dependency>
             <groupId>de.grundid.opendatalab</groupId>
             <artifactId>geojson-jackson</artifactId>
-            <version>1.5</version>
+            <version>1.8.1</version>
         </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>4.11</version>
+            <version>5.3</version>
         </dependency>
         <dependency>
             <groupId>org.entur.helpers</groupId>
@@ -234,7 +234,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.9.39</version>
+            <version>1.11.453</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
