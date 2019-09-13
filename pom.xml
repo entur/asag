@@ -38,7 +38,7 @@
         <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
         <httpcomponents.version>4.5.2</httpcomponents.version>
         <assertj-core.version>3.3.0</assertj-core.version>
-        <camel-version>2.22.3</camel-version>
+        <camel-version>2.24.2</camel-version>
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
         <docker.from>eu.gcr.io/carbon-1287/openjdk11-base-image</docker.from>
         <fabric8.dockerUser>carbon-1287/</fabric8.dockerUser>
