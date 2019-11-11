@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
                 "blobstore.gcs.container.name=container",
                 "blobstore.gcs.credential.path=credpath",
                 "blobstore.gcs.project.id=123",
-                "helper.hubot.endpoint=http://localhost:${wiremock.server.port}/hubot/say/"
+                "helper.slack.endpoint=http://localhost:${wiremock.server.port}/hubot/say/"
 
         })
 @AutoConfigureWireMock(port = 0)

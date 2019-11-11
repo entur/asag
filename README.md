@@ -10,3 +10,4 @@ With kubernetes. Execute the following while the mapbox job is running and has f
 ## Job specifications
 The kuberenetes job spec is located in babylon:
 https://github.com/entur/babylon/blob/master/src/main/resources/jobs/production/mapbox-update-pod.yaml
+https://storage.googleapis.com/marduk-production/tiamat/Current_latest.zip
