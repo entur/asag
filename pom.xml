@@ -115,8 +115,8 @@
         </dependency>
         <dependency>
             <groupId>org.entur.helpers</groupId>
-            <artifactId>hubot</artifactId>
-            <version>${entur.helpers.version}</version>
+            <artifactId>slack</artifactId>
+            <version>0.0.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -253,6 +253,11 @@
             <groupId>com.sun.activation</groupId>
             <artifactId>javax.activation</artifactId>
             <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.seratch</groupId>
+            <artifactId>jslack-api-client</artifactId>
+            <version>3.0.3</version>
         </dependency>
     </dependencies>
 

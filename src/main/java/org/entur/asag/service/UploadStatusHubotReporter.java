@@ -18,7 +18,7 @@ package org.entur.asag.service;
 import org.apache.camel.Body;
 import org.apache.camel.ExchangeProperty;
 import org.entur.asag.mapbox.model.MapBoxUploadStatus;
-import org.rutebanken.helper.hubot.HubotPostService;
+import org.rutebanken.helper.slack.SlackPostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +39,15 @@ public class UploadStatusHubotReporter {
     private static final String WARN_ICON = ":fire:";
 
     @Autowired
-    private HubotPostService hubotPostService;
+    private SlackPostService hubotPostService;
 
     @Value("${HOSTNAME:asag}")
     private String hostName;
 
 
     public void postStarted() {
-        hubotPostService.publish(new HubotPostService.HubotMessage("Started mapbox update", hostName, ICON));
+
+        hubotPostService.publish(new SlackPostService.SlackPayload("Started mapbox update" + hostName + ICON));
     }
 
     public void postUploadStatusToHubot(@Body MapBoxUploadStatus mapBoxUploadStatus, @ExchangeProperty(PROPERTY_STATE) String state) {
@@ -67,6 +68,6 @@ public class UploadStatusHubotReporter {
 
         logger.info("About to post message to hubot: {}", message);
 
-        hubotPostService.publish(new HubotPostService.HubotMessage(message, hostName, ICON));
+        hubotPostService.publish(new SlackPostService.SlackPayload(message + hostName + ICON));
     }
 }
