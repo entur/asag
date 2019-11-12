@@ -52,7 +52,7 @@ workflows:
     - docker/publish:
         pre-steps:
           - attach_workspace:
-              at: ~
+              at: ~/
         requires:
           - build
         name: push-release
