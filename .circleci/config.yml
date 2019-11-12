@@ -53,6 +53,7 @@ workflows:
         pre-steps:
           - attach_workspace:
               at: ~/project
+        checkout: false
         requires:
           - build
         name: push-release
