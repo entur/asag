@@ -43,12 +43,18 @@ jobs:
         - .circleci
         - Dockerfile
 workflows:
-  version: 2
+  version: 2.1
   build_test_deploy:
     jobs:
     - build:
+        name: build
         context: org-carbon
     - docker/publish:
+        pre-steps:
+          - attach_workspace:
+              at: ~/project
+        requires:
+          - build
         name: push-release
         image: asag
         registry: $DOCKER_REGISTRY
