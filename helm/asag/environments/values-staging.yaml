@@ -1,0 +1,6 @@
+environmentValues:
+  gcpProject: radon-1287
+  slackUrl: ror-staging-slack-url
+
+configmap:
+  containerName: marduk-stage

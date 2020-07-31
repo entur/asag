@@ -1,0 +1,7 @@
+environmentValues:
+  gcpProject: neon-1287
+  slackUrl: ror-prod-slack-url
+
+configmap:
+  containerName: marduk-production
+

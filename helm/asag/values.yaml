@@ -1,0 +1,22 @@
+resources:
+  cpuLimit: 900m
+  memLimit: 3000Mi
+  cpuRequest: 100m
+  memRequest: 1000Mi
+  xmx: 1500m
+
+secretMount:
+  name: asag-key
+  mountPath: /etc/asag/credentials.json
+  subPath: credentials.json
+  secretName: ror-asag-sa-key
+  readOnly: true
+
+configMapMount:
+  name: ror-asag-config
+
+image:
+  identifier: ${artifact.metadata.image}
+  imagePullPolicy: Always
+
+

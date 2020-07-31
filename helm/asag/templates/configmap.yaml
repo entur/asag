@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  application.properties: |-
+    blobstore.gcs.project.id={{ .Values.environmentValues.gcpProject }}
+    blobstore.gcs.credential.path=/etc/asag/credentials.json
+    blobstore.gcs.container.name={{.Values.configmap.containerName}}
+kind: ConfigMap
+metadata:
+  name: {{ template "app.name" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "common.labels" . | indent 4 }}
