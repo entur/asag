@@ -31,7 +31,7 @@ spec:
                       key: slack-url
                       name: {{ .Values.environmentValues.slackUrl }}
                 - name: MAPBOX_ACCESS_TOKEN
-                  valuesFrom:
+                  valueFrom:
                     secretKeyRef:
                       key: mapbox-access-token
                       name: ror-asag-secrets
