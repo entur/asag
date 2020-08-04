@@ -41,7 +41,7 @@ spec:
                       key: mapbox-user
                       name: ror-asag-secrets
 
-              image: {{ .Values.image.repo }}
+              image: {{ .Values.image.identifier }}
               imagePullPolicy: IfNotPresent
               name: mapbox-update-job
               resources:
