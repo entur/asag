@@ -36,7 +36,7 @@ spec:
                       key: mapbox-access-token
                       name: ror-asag-secrets
                 - name: MAPBOX_USER
-                  valuesFrom:
+                  valueFrom:
                     secretKeyRef:
                       key: mapbox-user
                       name: ror-asag-secrets
