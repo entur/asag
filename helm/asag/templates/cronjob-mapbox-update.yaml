@@ -36,10 +36,10 @@ spec:
                       key: mapbox-access-token
                       name: ror-asag-secrets
                 - name: MAPBOX_USER
-                    valuesFrom:
-                      secretKeyRef:
-                        key: mapbox-user
-                        name: ror-asag-secrets
+                  valuesFrom:
+                    secretKeyRef:
+                      key: mapbox-user
+                      name: ror-asag-secrets
 
               image: {{ .Values.image.repo }}
               imagePullPolicy: IfNotPresent
@@ -71,9 +71,9 @@ spec:
             secret:
               secretName: {{ .Values.secretMount.secretName }}
           - name: application-config
-              configMap:
-                name: {{ .Values.configMapMount.name }}
-                defaultMode: 420
+            configMap:
+              name: {{ .Values.configMapMount.name }}
+              defaultMode: 420
   schedule: '30 10 * ? *'
   successfulJobsHistoryLimit: 1
   suspend: false
