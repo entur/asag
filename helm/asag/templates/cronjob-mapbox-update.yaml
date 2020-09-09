@@ -33,12 +33,12 @@ spec:
                 - name: MAPBOX_ACCESS_TOKEN
                   valueFrom:
                     secretKeyRef:
-                      key: mapbox-access-token
+                      key: ror-asag-mapbox-access-token
                       name: ror-asag-secrets
                 - name: MAPBOX_USER
                   valueFrom:
                     secretKeyRef:
-                      key: mapbox-user
+                      key: ror-asag-mapbox-user
                       name: ror-asag-secrets
 
               image: {{ .Values.image.identifier }}

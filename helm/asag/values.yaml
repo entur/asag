@@ -13,7 +13,7 @@ secretMount:
   readOnly: true
 
 configMapMount:
-  name: ror-asag-config
+  name: asag-config
 
 image:
   identifier: ${artifact.metadata.image}
