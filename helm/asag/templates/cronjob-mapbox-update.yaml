@@ -21,7 +21,7 @@ spec:
                 - name: TZ
                   value: Europe/Oslo
                 - name: JAVA_OPTIONS
-                  value: -server -X{{ .Values.resources.xmx }} -Dspring.config.location=/etc/application-config/application.properties
+                  value: -server -Xmx{{ .Values.resources.xmx }} -Dspring.config.location=/etc/application-config/application.properties
                       -Dfile.encoding=UTF-8
                 - name: GCP_PROJECT
                   value: {{ .Values.environmentValues.gcpProject }}
