@@ -1,3 +1,3 @@
 gcp_project = "entur-ror-test"
 kube_namespace = "staging"
-asag_storage_bucket = "marduk-stage"
+asag_storage_bucket = "kakka-test"
