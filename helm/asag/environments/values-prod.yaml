@@ -1,3 +1,4 @@
+suspend: false
 environmentValues:
   gcpProject: entur-1287
   slackUrl: ror-prod-slack-url

@@ -74,6 +74,6 @@ spec:
             configMap:
               name: {{ .Values.configMapMount.name }}
               defaultMode: 420
-  schedule: '30 10 * ? *'
+  schedule: '30 06 * ? *'
   successfulJobsHistoryLimit: 1
-  suspend: false
+  suspend: {{ .Values.suspend }}
