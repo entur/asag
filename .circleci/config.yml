@@ -95,7 +95,7 @@ workflows:
         name: build
         context: org-carbon
     - docker-publish:
-        context: org-carbon
+        context: global
         requires:
           - build
         filters:
