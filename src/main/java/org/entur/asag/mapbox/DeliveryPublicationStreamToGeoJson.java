@@ -150,14 +150,14 @@ public class DeliveryPublicationStreamToGeoJson {
                 Set<String> adjacentSitesTypes = new HashSet<>();
                 if (!adjacentSites.isEmpty()) {
                     for (String siteRef : adjacentSites) {
-                        String adjacentSiteType = stopPlaceTypes.get(siteRef);
-                        adjacentSitesTypes.add(adjacentSiteType);
+                        Optional<String> adjacentSiteType = Optional.ofNullable(stopPlaceTypes.get(siteRef));
+                        adjacentSiteType.ifPresent(adjacentSitesTypes::add);
 
                     }
                     adjacentSitesTypes.add(getStopPlaceType(stopPlace));
                 }
-                String final_stop_type = adjacentSitesTypes.stream().sorted().collect(Collectors.joining("_"));
-                writeStop(stopPlace,final_stop_type, outputStream,outputStreamWriter);
+                String finalStopType = adjacentSitesTypes.stream().sorted().collect(Collectors.joining("_"));
+                writeStop(stopPlace,finalStopType, outputStream,outputStreamWriter);
                 if (stopPlaceIterator.hasNext()) {
                     writeComma(outputStreamWriter);
                 }
