@@ -38,7 +38,7 @@
         <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
         <httpcomponents.version>4.5.2</httpcomponents.version>
         <assertj-core.version>3.3.0</assertj-core.version>
-        <camel-version>2.22.3</camel-version>
+        <camel-version>3.0.0</camel-version>
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
         <netex-java-model.version>1.0.9-SNAPSHOT</netex-java-model.version>
         <entur.helpers.version>0.0.4-SNAPSHOT</entur.helpers.version>
@@ -68,12 +68,12 @@
         <dependency>
             <groupId>de.grundid.opendatalab</groupId>
             <artifactId>geojson-jackson</artifactId>
-            <version>1.8.1</version>
+            <version>1.12</version>
         </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>5.3</version>
+            <version>6.3</version>
         </dependency>
         <dependency>
             <groupId>org.entur.helpers</groupId>
@@ -223,7 +223,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.11.502</version>
+            <version>1.11.930</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
