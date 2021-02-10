@@ -1,6 +1,8 @@
-FROM openjdk:11-jre
+FROM adoptopenjdk/openjdk11:alpine-jre
 WORKDIR /deployments
-ADD target/asag-*-SNAPSHOT.jar asag.jar
-RUN mkdir /root/.ssh \
- && touch /root/.ssh/known_hosts
+COPY target/asag-*-SNAPSHOT.jar asag.jar
+RUN addgroup appuser && adduser --disabled-password appuser --ingroup appuser
+USER appuser
+RUN mkdir -p /home/appuser/.ssh \
+ && touch /home/appuser/.ssh/known_hosts
 CMD java $JAVA_OPTIONS -jar asag.jar
