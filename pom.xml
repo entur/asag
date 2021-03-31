@@ -42,7 +42,7 @@
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
         <netex-java-model.version>1.0.9-SNAPSHOT</netex-java-model.version>
         <entur.helpers.version>0.0.4-SNAPSHOT</entur.helpers.version>
-        <guava.version>26.0-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
     </properties>
 
 
