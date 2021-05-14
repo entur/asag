@@ -1,6 +1,6 @@
 suspend: true
 environmentValues:
-  gcpProject: entur-test-1287
+  gcpProject: entur-ror-test
   slackUrl: ror-staging-slack-url
 
 configmap:

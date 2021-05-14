@@ -1,6 +1,6 @@
 suspend: true
 environmentValues:
-  gcpProject: entur-dev-1287
+  gcpProject: entur-ror-dev
   slackUrl: ror-dev-slack-url
 
 configmap:
