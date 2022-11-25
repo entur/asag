@@ -1,0 +1,8 @@
+suspend: true
+environmentValues:
+  gcpProject: entur-ror-dev
+
+configmap:
+  containerName: kakka-dev
+
+

@@ -1,0 +1,7 @@
+suspend: false
+environmentValues:
+  gcpProject: neon-1287
+
+configmap:
+  containerName: kakka-production
+

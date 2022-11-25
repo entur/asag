@@ -1,0 +1,15 @@
+resources:
+  cpuLimit: 900m
+  memLimit: 3000Mi
+  cpuRequest: 100m
+  memRequest: 1000Mi
+  xmx: 1500m
+
+configMapMount:
+  name: asag-config
+
+image:
+  identifier: ${artifact.metadata.image}
+  imagePullPolicy: Always
+
+
