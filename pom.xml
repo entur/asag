@@ -41,7 +41,7 @@
         <camel-version>2.22.3</camel-version>
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
         <netex-java-model.version>1.0.13</netex-java-model.version>
-        <entur.helpers.version>1.0.81</entur.helpers.version>
+        <entur.helpers.version>1.86</entur.helpers.version>
         <guava.version>26.0-jre</guava.version>
         <hibernate-validator.version>5.2.3.Final</hibernate-validator.version>
         <geojson-jackson.version>1.8.1</geojson-jackson.version>

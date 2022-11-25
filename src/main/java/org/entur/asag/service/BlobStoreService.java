@@ -39,10 +39,15 @@ public class BlobStoreService {
     private final String containerName;
 
     @Autowired
-    public BlobStoreService(@Value("${blobstore.gcs.credential.path}") String credentialPath,
+    public BlobStoreService(@Value("${blobstore.gcs.credential.path:#{null}}") String credentialPath,
                                 @Value("${blobstore.gcs.container.name}") String containerName,
                                 @Value("${blobstore.gcs.project.id}") String projectId) {
-        this.storage = BlobStoreHelper.getStorage(credentialPath, projectId);
+        if (credentialPath == null || credentialPath.isEmpty()) {
+            // Used default credentials
+            this.storage = BlobStoreHelper.getStorage(projectId);
+        } else {
+            this.storage = BlobStoreHelper.getStorage(credentialPath, projectId);
+        }
         this.containerName = containerName;
         logger.info("Blobstore service set up. project: {}, container: {}", projectId, containerName);
     }
