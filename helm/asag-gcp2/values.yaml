@@ -17,6 +17,9 @@ common:
   shortname: asag
   team: ror
   container:
+    envFrom:
+     - secretRef:
+         name: ror-asag-secrets
     forceReplicas: 1
     image: ${artifact.metadata.image}
     cpuLimit: 1
