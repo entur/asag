@@ -1,8 +1,8 @@
-suspend: true
-environmentValues:
-  gcpProject: entur-ror-dev
-
-configmap:
-  containerName: kakka-dev
+common:
+  env: dev
+  configmap:
+    data:
+      BLOBSTORE_GCS_PROJECT_ID: entur-ror-dev
+      BLOBSTORE_GCS_CONTAINER_NAME: kakka-dev
 
 

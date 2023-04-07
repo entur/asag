@@ -1,7 +1,9 @@
-suspend: false
-environmentValues:
-  gcpProject: neon-1287
-
-configmap:
-  containerName: kakka-production
+common:
+  env: prd
+  cron:
+    suspend: false
+  configmap:
+    data:
+      BLOBSTORE_GCS_PROJECT_ID: neon-1287
+      BLOBSTORE_GCS_CONTAINER_NAME: kakka-production
 
