@@ -38,7 +38,7 @@
         <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
         <httpcomponents.version>4.5.2</httpcomponents.version>
         <assertj-core.version>3.3.0</assertj-core.version>
-        <camel-version>2.22.3</camel-version>
+        <camel-version>3.2.0</camel-version>
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
         <netex-java-model.version>1.0.13</netex-java-model.version>
         <entur.helpers.version>1.86</entur.helpers.version>
