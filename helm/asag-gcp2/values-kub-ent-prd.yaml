@@ -5,5 +5,5 @@ common:
   configmap:
     data:
       BLOBSTORE_GCS_PROJECT_ID: neon-1287
-      BLOBSTORE_GCS_CONTAINER_NAME: kakka-production
+      BLOBSTORE_GCS_CONTAINER_NAME: ror-kakka-production
 

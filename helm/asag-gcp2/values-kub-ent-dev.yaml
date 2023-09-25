@@ -2,7 +2,7 @@ common:
   env: dev
   configmap:
     data:
-      BLOBSTORE_GCS_PROJECT_ID: entur-ror-dev
-      BLOBSTORE_GCS_CONTAINER_NAME: kakka-dev
+      BLOBSTORE_GCS_PROJECT_ID: ent-kakka-dev
+      BLOBSTORE_GCS_CONTAINER_NAME: ror-kakka-dev
 
 

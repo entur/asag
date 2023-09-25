@@ -2,5 +2,5 @@ common:
   env: tst
   configmap:
     data:
-      BLOBSTORE_GCS_PROJECT_ID: entur-ror-test
-      BLOBSTORE_GCS_CONTAINER_NAME: kakka-test
+      BLOBSTORE_GCS_PROJECT_ID: ent-kakka-tst
+      BLOBSTORE_GCS_CONTAINER_NAME: ror-kakka-test
