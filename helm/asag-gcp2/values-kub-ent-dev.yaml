@@ -4,5 +4,6 @@ common:
     data:
       BLOBSTORE_GCS_PROJECT_ID: ent-kakka-dev
       BLOBSTORE_GCS_CONTAINER_NAME: ror-kakka-dev
+      MAPBOX_TILESET_FILE_NAME: carbon-1287
 
 

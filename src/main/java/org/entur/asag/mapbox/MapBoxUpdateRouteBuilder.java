@@ -61,8 +61,8 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
     @Value("${mapbox.api.url:https4://api.mapbox.com}")
     private String mapboxApiUrl;
 
-    @Value("${blobstore.gcs.project.id:}")
-    private String projectId;
+    @Value("${mapbox.tileset.file.name:}")
+    private String mapboxTilesetFileName;
 
     @Value("${mapbox.access.token:}")
     private String mapboxAccessToken;
@@ -86,8 +86,8 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
           	the map ID to create or replace in the format  username.nameoftileset - limited to 32 characters
           	(only  - and  _ special characters allowed, limit does not include username)
          */
-        final String tilesetName = mapboxUser + "." + (Strings.isNullOrEmpty(projectId) ? "tileset" : projectId);
-        final String geojsonFilename = (Strings.isNullOrEmpty(projectId) ? mapboxUser : projectId) + ".geojson";
+        final String tilesetName = mapboxUser + "." + (Strings.isNullOrEmpty(mapboxTilesetFileName) ? "tileset" : mapboxTilesetFileName);
+        final String geojsonFilename = (Strings.isNullOrEmpty(mapboxTilesetFileName) ? mapboxUser : mapboxTilesetFileName) + ".geojson";
 
         from("direct:uploadTiamatToMapboxAsGeoJson")
                 .bean("uploadStatusHubotReporter", "postStarted")

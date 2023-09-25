@@ -4,3 +4,4 @@ common:
     data:
       BLOBSTORE_GCS_PROJECT_ID: ent-kakka-tst
       BLOBSTORE_GCS_CONTAINER_NAME: ror-kakka-test
+      MAPBOX_TILESET_FILE_NAME: radon-1287
