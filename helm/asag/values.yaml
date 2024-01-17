@@ -1,4 +1,7 @@
 common:
+  app: asag
+  shortname: asag
+  team: ror
   deployment:
     enabled: false
   cron:
@@ -6,22 +9,13 @@ common:
     schedule: '30 06 * ? *'
     restartPolicy: Never
     suspend: true
-
   ingress:
     enabled: false
-
   service:
     enabled: false
-
-  app: asag
-  shortname: asag
-  team: ror
   container:
-    envFrom:
-     - secretRef:
-         name: ror-asag-secrets
     forceReplicas: 1
-    image: ${artifact.metadata.image}
+    image: <+artifacts.primary.image>
     cpuLimit: 1
     memoryLimit: 3000
     memory: 1000
@@ -30,7 +24,6 @@ common:
       enabled: false
     prometheus:
       enabled: false
-
   configmap:
     data:
       JAVA_OPTIONS: -server -Xmx1500m -Dfile.encoding=UTF-8
@@ -38,4 +31,9 @@ common:
       MAPBOX_DOWNLOAD_DIRECTORY: files/tmp/mapbox
     enabled: true
     toEnv: true
-
+  secrets:
+    mapbox: 
+      - MAPBOX_ACCESS_TOKEN
+      - MAPBOX_USER
+    slack:
+      - HELPER_SLACK_ENDPOINT
