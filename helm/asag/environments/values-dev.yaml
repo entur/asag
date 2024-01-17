@@ -1,9 +1,0 @@
-suspend: true
-environmentValues:
-  gcpProject: entur-ror-dev
-  slackUrl: ror-dev-slack-url
-
-configmap:
-  containerName: kakka-dev
-
-

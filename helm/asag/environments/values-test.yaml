@@ -1,7 +1,0 @@
-suspend: true
-environmentValues:
-  gcpProject: entur-ror-test
-  slackUrl: ror-staging-slack-url
-
-configmap:
-  containerName: kakka-test
