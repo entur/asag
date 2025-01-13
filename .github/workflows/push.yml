@@ -1,0 +1,49 @@
+name: Build and push
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  maven-verify:
+    env:
+      JFROG_USER: ${{ secrets.ARTIFACTORY_AUTH_USER }}
+      JFROG_PASS: ${{ secrets.ARTIFACTORY_AUTH_TOKEN }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Copy maven settings
+        run: |
+          wget https://raw.githubusercontent.com/entur/ror-maven-settings/master/.m2/settings.xml -O .github/workflows/settings.xml
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 11
+          distribution: liberica
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+            ${{ runner.os }}-maven-
+            ${{ runner.os }}-
+
+      - name: Run maven build
+        run: mvn verify -s .github/workflows/settings.xml
+  docker-build:
+    if: github.repository_owner == 'entur' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [maven-verify]
+    uses: entur/gha-docker/.github/workflows/build.yml@v1
+    with:
+      build_artifact_name: artifact
+      build_artifact_path: target
+  docker-push:
+    needs: [docker-build]
+    uses: entur/gha-docker/.github/workflows/push.yml@v1
