@@ -22,7 +22,7 @@ import net.opengis.gml._3.ObjectFactory;
 import org.geojson.Feature;
 import org.geojson.Point;
 import org.geojson.Polygon;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.*;
 
 import java.math.BigDecimal;

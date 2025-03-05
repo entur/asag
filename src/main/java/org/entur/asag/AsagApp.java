@@ -15,12 +15,12 @@
 
 package org.entur.asag;
 
-import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spring.boot.CamelSpringBootApplicationController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -33,7 +33,7 @@ public class AsagApp extends RouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(AsagApp.class);
 
-    @Produce(uri = "direct:uploadTiamatToMapboxAsGeoJson")
+    @Autowired
     ProducerTemplate producerTemplate;
 
     public static void main(String... args) throws Exception {
@@ -48,10 +48,13 @@ public class AsagApp extends RouteBuilder {
         AsagApp asagApp = applicationContext.getBean(AsagApp.class);
         asagApp.run();
 
+
     }
 
     private void run() {
-        producerTemplate.request("direct:uploadTiamatToMapboxAsGeoJson", System.out::println);
+
+        producerTemplate.sendBody("direct:uploadTiamatToMapboxAsGeoJson", "Startup payload");
+        logger.info("Sent message to direct:uploadTiamatToMapboxAsGeoJson");
     }
 
     @Override

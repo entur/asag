@@ -19,8 +19,8 @@ package org.entur.asag.mapbox;
 import com.google.common.base.Strings;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
-import org.apache.camel.spring.SpringRouteBuilder;
 import org.apache.commons.io.FileUtils;
 import org.entur.asag.mapbox.model.MapBoxAwsCredentials;
 import org.entur.asag.mapbox.model.MapBoxUploadStatus;
@@ -36,7 +36,7 @@ import static org.apache.camel.Exchange.FILE_NAME;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 
 @Component
-public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
+public class MapBoxUpdateRouteBuilder extends RouteBuilder {
 
     private static final String TIAMAT_EXPORT_GCP_PATH = "tiamat-export";
     public static final String LOOP_COUNTER = "LoopCounter";
@@ -113,7 +113,7 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
                             exchange.getIn().getHeader(FILE_NAME).toString())))
                 .marshal().json(JsonLibrary.Jackson)
                 .log(LoggingLevel.INFO, "Upload: ${body}")
-                .setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
+                .setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http.HttpMethods.POST))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
                 .to(mapboxApiUrl + "/uploads/v1/" + mapboxUser + "?access_token=" + mapboxAccessToken + "&throwExceptionOnFailure=false")
                 .to("log:DEBUG?showBody=true&showHeaders=true")
@@ -175,10 +175,10 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
 
         from("direct:fetchMapboxUploadStatus")
                 .setProperty("tilesetId", simple("${body.id}"))
-                .log("Checking status for tileset: ${property.tilesetId}")
+                .log("Checking status for tileset: ${exchangeProperty.tilesetId}")
                 .setBody(simple(""))
-                .setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.GET))
-                .toD(mapboxApiUrl + "/uploads/v1/" + mapboxUser + "/${property.tilesetId}?access_token=" + mapboxAccessToken)
+                .setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http.HttpMethods.GET))
+                .toD(mapboxApiUrl + "/uploads/v1/" + mapboxUser + "/${exchangeProperty.tilesetId}?access_token=" + mapboxAccessToken)
                 .unmarshal().json(JsonLibrary.Jackson, MapBoxUploadStatus.class)
                 .log("Received status ${body}")
                 .routeId("fetch-mapbox-upload-status");
@@ -218,9 +218,9 @@ public class MapBoxUpdateRouteBuilder extends SpringRouteBuilder {
                 .routeId("mapbox-transform-from-tiamat");
 
         from("direct:cleanUpLocalDirectory")
-                .log(LoggingLevel.DEBUG, getClass().getName(), "Deleting local directory ${property." + Exchange.FILE_PARENT + "} ...")
+                .log(LoggingLevel.DEBUG, getClass().getName(), "Deleting local directory ${exchangeProperty." + Exchange.FILE_PARENT + "} ...")
                 .process(e -> deleteDirectory(new File(e.getIn().getHeader(Exchange.FILE_PARENT, String.class))))
-                .log(LoggingLevel.DEBUG, getClass().getName(),  "Local directory ${property." + Exchange.FILE_PARENT + "} cleanup done.")
+                .log(LoggingLevel.DEBUG, getClass().getName(),  "Local directory ${exchangeProperty." + Exchange.FILE_PARENT + "} cleanup done.")
                 .routeId("cleanup-local-dir");
     }
 }

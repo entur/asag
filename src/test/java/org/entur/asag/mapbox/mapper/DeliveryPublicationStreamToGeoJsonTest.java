@@ -20,11 +20,11 @@ import org.entur.asag.mapbox.DeliveryPublicationStreamToGeoJson;
 import org.entur.asag.mapbox.filter.ValidityFilter;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.validation.NeTExValidator;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
