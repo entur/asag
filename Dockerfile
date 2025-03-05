@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:alpine-jre
+FROM bellsoft/liberica-openjdk-alpine:21.0.5-11
 WORKDIR /deployments
 COPY target/asag-*-SNAPSHOT.jar asag.jar
 RUN addgroup appuser && adduser --disabled-password appuser --ingroup appuser
