@@ -58,7 +58,7 @@ public class MapBoxUpdateRouteBuilder extends RouteBuilder {
     @Value("${mapbox.download.directory:files/mapbox}")
     private String localWorkingDirectory;
 
-    @Value("${mapbox.api.url:https4://api.mapbox.com}")
+    @Value("${mapbox.api.url:https://api.mapbox.com}")
     private String mapboxApiUrl;
 
     @Value("${mapbox.tileset.file.name:}")
