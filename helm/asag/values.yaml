@@ -26,7 +26,7 @@ common:
       enabled: false
   configmap:
     data:
-      JAVA_OPTIONS: -server -Xmx1500m -Dfile.encoding=UTF-8
+      JDK_JAVA_OPTIONS: -server -Xmx1500m -Dfile.encoding=UTF-8
       TZ: Europe/Oslo
       MAPBOX_DOWNLOAD_DIRECTORY: files/tmp/mapbox
     enabled: true

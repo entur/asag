@@ -16,7 +16,7 @@
 package org.entur.asag.mapbox.mapper;
 
 import org.geojson.Feature;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.CoveredEnumeration;
 import org.rutebanken.netex.model.Parking;
 import org.rutebanken.netex.model.ParkingVehicleEnumeration;

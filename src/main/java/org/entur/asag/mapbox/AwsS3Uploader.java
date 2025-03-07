@@ -20,6 +20,7 @@ import com.amazonaws.auth.BasicSessionCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.apache.camel.Body;
 import org.apache.camel.Header;
@@ -45,7 +46,6 @@ public class AwsS3Uploader {
     public AmazonS3Client createClient(MapBoxAwsCredentials mapBoxAwsCredentials) {
         AWSCredentials credentials = new BasicSessionCredentials(mapBoxAwsCredentials.getAccessKeyId(),
                 mapBoxAwsCredentials.getSecretAccessKey(), mapBoxAwsCredentials.getSessionToken());
-
         return new AmazonS3Client(credentials);
     }
 
