@@ -1,4 +1,4 @@
-# asag [![Build](https://github.com/entur/asag/actions/workflows/push.yml/badge.svg)
+# asag ![Build](https://github.com/entur/asag/actions/workflows/push.yml/badge.svg)
 Update mapbox tilset with netex stop place data
 
 
