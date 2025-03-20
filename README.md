@@ -1,4 +1,4 @@
-# asag [![CircleCI](https://circleci.com/gh/entur/asag/tree/master.svg?style=svg)](https://circleci.com/gh/entur/asag/tree/master)
+# asag [![Build](https://github.com/entur/asag/actions/workflows/push.yml/badge.svg)
 Update mapbox tilset with netex stop place data
 
 
