@@ -37,6 +37,9 @@ jobs:
 
       - name: Run maven build
         run: mvn verify -s .github/workflows/settings.xml
+      - uses: actions/upload-artifact@v4.6.1
+        with:
+          path: target/*.jar
   docker-build:
     if: github.repository_owner == 'entur' && github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: [maven-verify]
