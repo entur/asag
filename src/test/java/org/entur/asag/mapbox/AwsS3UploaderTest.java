@@ -29,18 +29,25 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+
 
 public class AwsS3UploaderTest {
 
+    private static AwsS3Uploader uploaderWith(S3Client client) {
+        return new AwsS3Uploader() {
+            @Override
+            public S3Client createClient(MapBoxAwsCredentials creds) {
+                return client;
+            }
+        };
+    }
+
     @Test
     public void uploadCallsPutObjectWithCredentialBucketAndKey() throws IOException {
-        AwsS3Uploader uploader = spy(new AwsS3Uploader());
         S3Client mockS3Client = mock(S3Client.class);
-        doReturn(mockS3Client).when(uploader).createClient(any());
+        AwsS3Uploader uploader = uploaderWith(mockS3Client);
 
         MapBoxAwsCredentials credentials = credentials("my-bucket", "my/key");
         InputStream data = new ByteArrayInputStream("{\"type\":\"FeatureCollection\"}".getBytes(StandardCharsets.UTF_8));
@@ -55,9 +62,8 @@ public class AwsS3UploaderTest {
 
     @Test
     public void uploadSetsContentTypeToApplicationJson() throws IOException {
-        AwsS3Uploader uploader = spy(new AwsS3Uploader());
         S3Client mockS3Client = mock(S3Client.class);
-        doReturn(mockS3Client).when(uploader).createClient(any());
+        AwsS3Uploader uploader = uploaderWith(mockS3Client);
 
         InputStream data = new ByteArrayInputStream("{}".getBytes(StandardCharsets.UTF_8));
         uploader.upload(credentials("bucket", "key"), "file.geojson", data);
@@ -70,9 +76,8 @@ public class AwsS3UploaderTest {
 
     @Test
     public void uploadSetsContentLengthFromReadAllBytes() throws IOException {
-        AwsS3Uploader uploader = spy(new AwsS3Uploader());
         S3Client mockS3Client = mock(S3Client.class);
-        doReturn(mockS3Client).when(uploader).createClient(any());
+        AwsS3Uploader uploader = uploaderWith(mockS3Client);
 
         byte[] payload = "{\"type\":\"FeatureCollection\",\"features\":[]}".getBytes(StandardCharsets.UTF_8);
         InputStream data = new ByteArrayInputStream(payload);
