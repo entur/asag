@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: Approve    # Requires reviewer approval in GitHub Settings
     steps:
-      - run: echo "Approved
+      - run: echo "Approved"
   helm-deploy-prod:
     needs: [ approval-prd, helm-lint, docker-push ]
     uses: entur/gha-helm/.github/workflows/deploy.yml@v1
