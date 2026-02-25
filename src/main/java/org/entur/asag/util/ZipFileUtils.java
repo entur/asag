@@ -49,6 +49,7 @@ public class ZipFileUtils {
 
     public static void unzipFile(InputStream inputStream, String targetFolder) {
         try {
+            File targetDir = new File(targetFolder).getCanonicalFile();
             byte[] buffer = new byte[1024];
             ZipInputStream zis = new ZipInputStream(inputStream);
             ZipEntry zipEntry = zis.getNextEntry();
@@ -56,9 +57,14 @@ public class ZipFileUtils {
                 String fileName = zipEntry.getName();
                 logger.info("unzipping file: {}", fileName);
 
-                File newFile = new File(targetFolder + "/" + fileName);
+                File newFile = new File(targetDir, fileName).getCanonicalFile();
+                if (!newFile.toPath().startsWith(targetDir.toPath())) {
+                    throw new RuntimeException("Zip entry outside of target directory: " + fileName);
+                }
+
                 if (fileName.endsWith("/")) {
                     newFile.mkdirs();
+                    zipEntry = zis.getNextEntry();
                     continue;
                 }
 
@@ -66,7 +72,6 @@ public class ZipFileUtils {
                 if (parent != null) {
                     parent.mkdirs();
                 }
-
 
                 FileOutputStream fos = new FileOutputStream(newFile);
                 int len;
