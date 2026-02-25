@@ -17,7 +17,7 @@ package org.entur.asag.mapbox.mapper;
 
 import org.entur.asag.netex.PublicationDeliveryHelper;
 import org.geojson.Feature;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AirSubmodeEnumeration;
 import org.rutebanken.netex.model.EntityStructure;
 import org.rutebanken.netex.model.InterchangeWeightingEnumeration;

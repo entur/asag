@@ -20,11 +20,11 @@ import org.entur.asag.mapbox.DeliveryPublicationStreamToGeoJson;
 import org.entur.asag.mapbox.filter.ValidityFilter;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.validation.NeTExValidator;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DeliveryPublicationStreamToGeoJsonTest {
 
@@ -137,7 +138,7 @@ public class DeliveryPublicationStreamToGeoJsonTest {
      * Ensures that malformed XML causes a RuntimeException to be thrown rather
      * than silently producing empty or partial output.
      */
-    @Test(expected = RuntimeException.class)
+    @Test
     public void transformThrowsRuntimeExceptionOnMalformedXml() throws JAXBException {
         DeliveryPublicationStreamToGeoJson freshInstance = new DeliveryPublicationStreamToGeoJson(
                 stopPlaceToGeoJsonFeatureMapper,
@@ -146,7 +147,8 @@ public class DeliveryPublicationStreamToGeoJsonTest {
                 tariffZoneToGeoJsonFeatureMapper,
                 validityFilter);
 
-        freshInstance.transform(new ByteArrayInputStream("<<<<not valid xml".getBytes(StandardCharsets.UTF_8)));
+        assertThrows(RuntimeException.class, () ->
+                freshInstance.transform(new ByteArrayInputStream("<<<<not valid xml".getBytes(StandardCharsets.UTF_8))));
     }
 
     /**

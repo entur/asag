@@ -15,7 +15,7 @@
 
 package org.entur.asag.mapbox.filter;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.ValidBetween;
 
 import java.time.LocalDateTime;

@@ -16,16 +16,15 @@
 package org.entur.asag;
 
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.model.ModelCamelContext;
 import org.entur.asag.mapbox.MapBoxUpdateRouteBuilder;
 import org.entur.asag.service.BlobStoreService;
 import org.entur.asag.service.UploadStatusHubotReporter;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,13 +53,15 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = MapBoxUpdateRouteBuilder.class,
         properties = {
                 "spring.main.sources=org.entur.asag",
-                "mapbox.api.url=http4://localhost:${wiremock.server.port}",
+                "mapbox.api.url=http://localhost:${wiremock.server.port}",
                 "mapbox.upload.status.poll.delay=0",
+                "mapbox.upload.status.max.retries=3",
                 "blobstore.gcs.container.name=container",
                 "blobstore.gcs.credential.path=credpath",
                 "blobstore.gcs.project.id=123",
-                "helper.slack.endpoint=http://localhost:${wiremock.server.port}/hubot/say/"
-
+                "helper.slack.endpoint=http://localhost:${wiremock.server.port}/hubot/say/",
+                "camel.springboot.use-advice-with=true",
+                "asag.run.on.startup=false"
         })
 @AutoConfigureWireMock(port = 0)
 public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTestBase {
@@ -83,12 +84,12 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
             " \"secretAccessKey\": \"secretAKey\", \"sessionToken\": \"sestoken\", \"url\": \"http://localhost:0000\" }";
 
     @Autowired
-    private ModelCamelContext context;
+    private CamelContext context;
 
     @Value("${tiamat.export.blobstore.subdirectory:tiamat/geocoder}")
     private String blobStoreSubdirectoryForTiamatGeoCoderExport;
 
-    @Produce(uri = "direct:uploadTiamatToMapboxAsGeoJson")
+    @Produce("direct:uploadTiamatToMapboxAsGeoJson")
     protected ProducerTemplate producerTemplate;
 
     @Autowired
@@ -100,7 +101,7 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
     @Value("${wiremock.server.port}")
     private int wiremockServerPort;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
 
         System.out.println("Wiremock port is: " + +wiremockServerPort);

@@ -16,7 +16,7 @@
 package org.entur.asag.mapbox.mapper;
 
 import org.geojson.Feature;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.Quay;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;

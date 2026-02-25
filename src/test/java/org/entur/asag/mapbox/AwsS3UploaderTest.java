@@ -15,11 +15,12 @@
 
 package org.entur.asag.mapbox;
 
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.entur.asag.mapbox.model.MapBoxAwsCredentials;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -39,7 +39,7 @@ public class AwsS3UploaderTest {
     @Test
     public void uploadCallsPutObjectWithCredentialBucketAndKey() throws IOException {
         AwsS3Uploader uploader = spy(new AwsS3Uploader());
-        AmazonS3Client mockS3Client = mock(AmazonS3Client.class);
+        S3Client mockS3Client = mock(S3Client.class);
         doReturn(mockS3Client).when(uploader).createClient(any());
 
         MapBoxAwsCredentials credentials = credentials("my-bucket", "my/key");
@@ -47,28 +47,31 @@ public class AwsS3UploaderTest {
 
         uploader.upload(credentials, "entur.geojson", data);
 
-        verify(mockS3Client).putObject(eq("my-bucket"), eq("my/key"), any(InputStream.class), any(ObjectMetadata.class));
+        ArgumentCaptor<PutObjectRequest> requestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+        verify(mockS3Client).putObject(requestCaptor.capture(), any(RequestBody.class));
+        assertThat(requestCaptor.getValue().bucket()).isEqualTo("my-bucket");
+        assertThat(requestCaptor.getValue().key()).isEqualTo("my/key");
     }
 
     @Test
     public void uploadSetsContentTypeToApplicationJson() throws IOException {
         AwsS3Uploader uploader = spy(new AwsS3Uploader());
-        AmazonS3Client mockS3Client = mock(AmazonS3Client.class);
+        S3Client mockS3Client = mock(S3Client.class);
         doReturn(mockS3Client).when(uploader).createClient(any());
 
         InputStream data = new ByteArrayInputStream("{}".getBytes(StandardCharsets.UTF_8));
         uploader.upload(credentials("bucket", "key"), "file.geojson", data);
 
-        ArgumentCaptor<ObjectMetadata> metadataCaptor = ArgumentCaptor.forClass(ObjectMetadata.class);
-        verify(mockS3Client).putObject(any(), any(), any(), metadataCaptor.capture());
+        ArgumentCaptor<PutObjectRequest> requestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+        verify(mockS3Client).putObject(requestCaptor.capture(), any(RequestBody.class));
 
-        assertThat(metadataCaptor.getValue().getContentType()).isEqualTo("application/json");
+        assertThat(requestCaptor.getValue().contentType()).isEqualTo("application/json");
     }
 
     @Test
-    public void uploadSetsContentLengthFromStreamAvailable() throws IOException {
+    public void uploadSetsContentLengthFromReadAllBytes() throws IOException {
         AwsS3Uploader uploader = spy(new AwsS3Uploader());
-        AmazonS3Client mockS3Client = mock(AmazonS3Client.class);
+        S3Client mockS3Client = mock(S3Client.class);
         doReturn(mockS3Client).when(uploader).createClient(any());
 
         byte[] payload = "{\"type\":\"FeatureCollection\",\"features\":[]}".getBytes(StandardCharsets.UTF_8);
@@ -76,45 +79,10 @@ public class AwsS3UploaderTest {
 
         uploader.upload(credentials("bucket", "key"), "file.geojson", data);
 
-        ArgumentCaptor<ObjectMetadata> metadataCaptor = ArgumentCaptor.forClass(ObjectMetadata.class);
-        verify(mockS3Client).putObject(any(), any(), any(), metadataCaptor.capture());
+        ArgumentCaptor<PutObjectRequest> requestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+        verify(mockS3Client).putObject(requestCaptor.capture(), any(RequestBody.class));
 
-        // ByteArrayInputStream.available() returns the full byte count
-        assertThat(metadataCaptor.getValue().getContentLength()).isEqualTo(payload.length);
-    }
-
-    /**
-     * Documents the known limitation: InputStream.available() returns 0 for
-     * streams that do not pre-buffer (e.g. network streams, PipedInputStream).
-     * This causes a zero Content-Length header to be sent to S3, which can result
-     * in empty or rejected uploads.
-     */
-    @Test
-    public void contentLengthIsZeroForNonBufferedStream() throws IOException {
-        AwsS3Uploader uploader = spy(new AwsS3Uploader());
-        AmazonS3Client mockS3Client = mock(AmazonS3Client.class);
-        doReturn(mockS3Client).when(uploader).createClient(any());
-
-        InputStream nonBufferedStream = new InputStream() {
-            @Override
-            public int read() {
-                return -1;
-            }
-
-            @Override
-            public int available() {
-                return 0; // always 0 — simulates a network/piped stream
-            }
-        };
-
-        uploader.upload(credentials("bucket", "key"), "file.geojson", nonBufferedStream);
-
-        ArgumentCaptor<ObjectMetadata> metadataCaptor = ArgumentCaptor.forClass(ObjectMetadata.class);
-        verify(mockS3Client).putObject(any(), any(), any(), metadataCaptor.capture());
-
-        assertThat(metadataCaptor.getValue().getContentLength())
-                .as("Content-Length is 0 for non-buffered streams due to InputStream.available() limitation")
-                .isEqualTo(0L);
+        assertThat(requestCaptor.getValue().contentLength()).isEqualTo((long) payload.length);
     }
 
     @Test
@@ -125,7 +93,7 @@ public class AwsS3UploaderTest {
         credentials.setSecretAccessKey("wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY");
         credentials.setSessionToken("session-token-value");
 
-        AmazonS3Client client = uploader.createClient(credentials);
+        S3Client client = uploader.createClient(credentials);
 
         assertThat(client).isNotNull();
     }
