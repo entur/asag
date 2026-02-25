@@ -35,9 +35,19 @@ import org.springframework.test.annotation.DirtiesContext;
 import java.io.File;
 import java.io.FileInputStream;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.NoSuchElementException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import org.apache.commons.io.FileUtils;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.entur.asag.mapbox.MapBoxUpdateRouteBuilder.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -145,6 +155,79 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
         assertState(e, STATE_TIMEOUT);
     }
 
+
+    /**
+     * When the blob store returns null (file not found in GCS), the download route
+     * logs and continues without writing the ZIP file. The subsequent unzip step then
+     * tries to open a FileInputStream on a non-existent path, causing a
+     * FileNotFoundException wrapped in RuntimeException. The route should fail rather
+     * than silently produce empty GeoJSON.
+     */
+    @Test
+    public void testNullBlobCausesRouteFailure() throws Exception {
+        // Reset the blob stub from @Before so getBlob() returns null
+        reset(blobStoreService);
+
+        boolean failed = false;
+        try {
+            Exchange e = producerTemplate.request("direct:uploadTiamatToMapboxAsGeoJson", exc -> {});
+            failed = e.isFailed();
+        } catch (Exception e) {
+            // ProducerTemplate may propagate the exception directly — both are failure indicators
+            failed = true;
+        }
+
+        assertThat(failed)
+                .as("Route should fail when the blob store returns null (file not found in GCS)")
+                .isTrue();
+    }
+
+    /**
+     * When the downloaded ZIP contains no XML files, findFirstXmlFileRecursive throws
+     * NoSuchElementException from Optional.get() on an empty stream. The route should
+     * fail rather than silently continuing with a null body.
+     */
+    @Test
+    public void testZipWithNoXmlFilesCausesRouteFailure() throws Exception {
+        reset(blobStoreService);
+
+        // Remove any XML files left in the working directory by previous tests.
+        // The route's cleanUpLocalDirectory step is commented out, so files persist
+        // across test runs within the same JVM invocation.
+        FileUtils.deleteDirectory(new File("files/mapbox/tiamat"));
+
+        // Build a ZIP that contains only a non-XML file
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            ZipEntry entry = new ZipEntry("data.csv");
+            zos.putNextEntry(entry);
+            zos.write("id,name\n1,stop".getBytes());
+            zos.closeEntry();
+        }
+
+        when(blobStoreService.getBlob(anyString()))
+                .thenReturn(new ByteArrayInputStream(baos.toByteArray()));
+
+        stubCredentials();
+
+        boolean failed = false;
+        try {
+            Exchange e = producerTemplate.request("direct:uploadTiamatToMapboxAsGeoJson", exc -> {});
+            failed = e.isFailed();
+            if (failed && e.getException() != null) {
+                assertThat(e.getException()).isInstanceOf(NoSuchElementException.class);
+            }
+        } catch (Exception e) {
+            failed = true;
+            // Unwrap CamelExecutionException to verify the root cause
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            assertThat(cause).isInstanceOf(NoSuchElementException.class);
+        }
+
+        assertThat(failed)
+                .as("Route should fail when the ZIP contains no XML files")
+                .isTrue();
+    }
 
     private void assertState(Exchange e, String state) {
         assertThat(e.getProperties().get(PROPERTY_STATE)).isEqualTo(state);
