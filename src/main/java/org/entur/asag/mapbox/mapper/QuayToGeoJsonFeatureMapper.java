@@ -15,6 +15,7 @@
 
 package org.entur.asag.mapbox.mapper;
 
+import jakarta.xml.bind.JAXBElement;
 import org.geojson.Feature;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
@@ -47,6 +48,7 @@ public class QuayToGeoJsonFeatureMapper {
         if (quays_relStructure != null && !CollectionUtils.isEmpty(quays_relStructure.getQuayRefOrQuay())) {
             return quays_relStructure.getQuayRefOrQuay().stream()
                     .filter(Objects::nonNull)
+                    .map(JAXBElement::getValue)
                     .filter(o -> o instanceof Quay)
                     .map(o -> (Quay) o)
                     .map(this::mapQuayToGeojsonFeature)

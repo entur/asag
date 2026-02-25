@@ -20,11 +20,11 @@ import org.entur.asag.mapbox.DeliveryPublicationStreamToGeoJson;
 import org.entur.asag.mapbox.filter.ValidityFilter;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.validation.NeTExValidator;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -32,8 +32,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DeliveryPublicationStreamToGeoJsonTest {
 
@@ -84,6 +89,109 @@ public class DeliveryPublicationStreamToGeoJsonTest {
 
         assertThat(resolvePropertiesByValue(featureCollection, "finalStopPlaceType"))
                 .contains("onstreetBus", "railStation");
+    }
+
+    /**
+     * Regression test for the instance-level statefulness defect in
+     * DeliveryPublicationStreamToGeoJson. The stopPlaces, parkings and tariffZones
+     * sets are initialised in the constructor and never cleared between calls.
+     * Calling transform() a second time on the same bean (which Spring uses as a
+     * singleton) accumulates entities from the first call into the output.
+     *
+     * This test documents the current behaviour. A correct fix would clear the
+     * collections at the start of each transform() invocation.
+     */
+    @Test
+    public void secondTransformCallOnSameInstanceAccumulatesStateFromFirstCall() throws Exception {
+        // First call — valid input
+        FileInputStream firstInput = new FileInputStream(SRC_TEST_RESOURCES_PUBLICATION_DELIVERY_XML);
+        ByteArrayOutputStream firstOutput = (ByteArrayOutputStream) deliveryPublicationStreamToGeoJson.transform(firstInput);
+        FeatureCollection firstCollection = new ObjectMapper().readValue(firstOutput.toString(), FeatureCollection.class);
+        int firstCount = firstCollection.getFeatures().size();
+
+        // Second call — completely empty NeTEx (no stops, parkings or tariff zones)
+        String emptyNeTEx = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                + "<PublicationDelivery xmlns=\"http://www.netex.org.uk/netex\" version=\"139\">"
+                + "<PublicationTimestamp>2018-01-16T02:58:31.377</PublicationTimestamp>"
+                + "<ParticipantRef>NSR</ParticipantRef>"
+                + "<dataObjects>"
+                + "<SiteFrame modification=\"new\" version=\"1\" id=\"NSR:SiteFrame:1\"/>"
+                + "</dataObjects>"
+                + "</PublicationDelivery>";
+
+        ByteArrayOutputStream secondOutput = (ByteArrayOutputStream) deliveryPublicationStreamToGeoJson.transform(
+                new ByteArrayInputStream(emptyNeTEx.getBytes(StandardCharsets.UTF_8)));
+        FeatureCollection secondCollection = new ObjectMapper().readValue(secondOutput.toString(), FeatureCollection.class);
+
+        // A stateless implementation with empty input would produce 0 features.
+        // Due to accumulated state the second call still contains data from the first call.
+        assertThat(secondCollection.getFeatures()).isNotEmpty();
+        List<String> firstIds = firstCollection.getFeatures().stream()
+                .map(Feature::getId)
+                .collect(Collectors.toList());
+        assertThat(secondCollection.getFeatures())
+                .extracting(Feature::getId)
+                .containsAll(firstIds);
+    }
+
+    /**
+     * Ensures that malformed XML causes a RuntimeException to be thrown rather
+     * than silently producing empty or partial output.
+     */
+    @Test
+    public void transformThrowsRuntimeExceptionOnMalformedXml() throws JAXBException {
+        DeliveryPublicationStreamToGeoJson freshInstance = new DeliveryPublicationStreamToGeoJson(
+                stopPlaceToGeoJsonFeatureMapper,
+                parkingToGeoJsonFeatureMapper,
+                quayToGeoJsonFeatureMapper,
+                tariffZoneToGeoJsonFeatureMapper,
+                validityFilter);
+
+        assertThrows(RuntimeException.class, () ->
+                freshInstance.transform(new ByteArrayInputStream("<<<<not valid xml".getBytes(StandardCharsets.UTF_8))));
+    }
+
+    /**
+     * Verifies that a TariffZone without any geometry (no polygon, no centroid) is
+     * silently skipped and does NOT appear in the GeoJSON output.
+     * VKT:TariffZone:788 in publication-delivery.xml has no geometry.
+     */
+    @Test
+    public void tariffZoneWithoutGeometryIsExcludedFromOutput() throws Exception {
+        FileInputStream fileInputStream = new FileInputStream(SRC_TEST_RESOURCES_PUBLICATION_DELIVERY_XML);
+        ByteArrayOutputStream output = (ByteArrayOutputStream) new DeliveryPublicationStreamToGeoJson(
+                stopPlaceToGeoJsonFeatureMapper,
+                parkingToGeoJsonFeatureMapper,
+                quayToGeoJsonFeatureMapper,
+                tariffZoneToGeoJsonFeatureMapper,
+                validityFilter).transform(fileInputStream);
+
+        FeatureCollection featureCollection = new ObjectMapper().readValue(output.toString(), FeatureCollection.class);
+
+        assertThat(featureCollection.getFeatures())
+                .extracting(Feature::getId)
+                .doesNotContain("VKT:TariffZone:788");
+    }
+
+    /**
+     * Verifies that an expired stop place (ToDate in the past) is excluded from output.
+     * NSR:StopPlace:22 in publication-delivery.xml has ToDate=2017-06-20 (expired).
+     */
+    @Test
+    public void expiredStopPlaceIsExcludedFromOutput() throws Exception {
+        FileInputStream fileInputStream = new FileInputStream(SRC_TEST_RESOURCES_PUBLICATION_DELIVERY_XML);
+        ByteArrayOutputStream output = (ByteArrayOutputStream) new DeliveryPublicationStreamToGeoJson(
+                stopPlaceToGeoJsonFeatureMapper,
+                parkingToGeoJsonFeatureMapper,
+                quayToGeoJsonFeatureMapper,
+                tariffZoneToGeoJsonFeatureMapper,
+                validityFilter).transform(fileInputStream);
+
+        FeatureCollection featureCollection = new ObjectMapper().readValue(output.toString(), FeatureCollection.class);
+
+        assertThat(featureCollection.getFeatures())
+                .extracting(Feature::getId)
+                .doesNotContain("NSR:StopPlace:22");
     }
 
     private List<String> resolvePropertiesByValue(FeatureCollection featureCollection, String key) {

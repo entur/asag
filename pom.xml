@@ -19,6 +19,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.entur.ror</groupId>
+        <artifactId>superpom</artifactId>
+        <version>5.3.0</version>
+    </parent>
+
     <groupId>org.entur.asag</groupId>
     <artifactId>asag</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -33,50 +39,75 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <docker.maven.plugin.version>0.21.0</docker.maven.plugin.version>
-        <spring-boot-plugin.version>2.1.1.RELEASE</spring-boot-plugin.version>
-        <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
-        <httpcomponents.version>4.5.2</httpcomponents.version>
-        <assertj-core.version>3.3.0</assertj-core.version>
-        <camel-version>2.22.3</camel-version>
-        <spring.security.version>4.2.3.RELEASE</spring.security.version>
-        <netex-java-model.version>1.0.13</netex-java-model.version>
-        <entur.helpers.version>1.86</entur.helpers.version>
-        <guava.version>26.0-jre</guava.version>
-        <hibernate-validator.version>5.2.3.Final</hibernate-validator.version>
-        <geojson-jackson.version>1.8.1</geojson-jackson.version>
-        <logstash-logback-encoder.version>5.3</logstash-logback-encoder.version>
-        <commons-compress.version>1.18</commons-compress.version>
-        <commons-io.version>1.3.2</commons-io.version>
-        <spring-cloud-contract-wiremock.version>1.2.2.RELEASE</spring-cloud-contract-wiremock.version>
-        <aws-java-sdk-s3.version>1.11.502</aws-java-sdk-s3.version>
-        <jaxb-api.version>2.3.0</jaxb-api.version>
-        <jaxb-runtime.version>2.3.0.1</jaxb-runtime.version>
-        <javax.activation.version>1.2.0</javax.activation.version>
-        <jslack-api-client.version>3.0.3</jslack-api-client.version>
-        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <httpcomponents.version>4.5.14</httpcomponents.version>
+        <camel-version>4.18.0</camel-version>
+        <netex-java-model.version>2.0.15.2</netex-java-model.version>
+        <entur.helpers.version>6.1.0</entur.helpers.version>
+        <guava.version>33.5.0-jre</guava.version>
+        <geojson-jackson.version>3.0</geojson-jackson.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
+        <commons-io.version>2.21.0</commons-io.version>
+        <wiremock-spring-boot.version>4.1.0</wiremock-spring-boot.version>
+        <jaxb-api.version>4.0.5</jaxb-api.version>
+        <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
+        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <aws-sdk-v2.version>2.42.1</aws-sdk-v2.version>
+        <mockito.version>5.20.0</mockito.version>
+        <logback.version>1.5.32</logback.version>
+        <assertj.version>3.27.7</assertj.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
     </properties>
 
 
     <dependencyManagement>
         <dependencies>
+            <!-- Camel 4 core BOM (manages org.apache.camel:* artifact versions) -->
             <dependency>
-                <!-- Import dependency management from Spring Boot -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-bom</artifactId>
+                <version>${camel-version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- Camel 4 Spring Boot BOM (manages org.apache.camel.springboot:* starters) -->
+            <dependency>
+                <groupId>org.apache.camel.springboot</groupId>
+                <artifactId>camel-spring-boot-bom</artifactId>
+                <version>${camel-version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- AWS SDK v2 BOM -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws-sdk-v2.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Netty BOM - override transitive version (CVE-2025-67735) -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.1.131.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- okhttp/okio - override transitive versions from jslack (CVE-2023-0833, CVE-2023-3635) -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>4.12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio</artifactId>
+                <version>3.16.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate-validator.version}</version>
-        </dependency>
         <dependency>
             <groupId>de.grundid.opendatalab</groupId>
             <artifactId>geojson-jackson</artifactId>
@@ -85,17 +116,12 @@
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>${logstash-logback-encoder.version}</version>
         </dependency>
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
-            <artifactId>gcp-storage</artifactId>
+            <artifactId>storage-gcp-gcs</artifactId>
             <version>${entur.helpers.version}</version>
             <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
                 <exclusion>
                     <groupId>io.netty</groupId>
                     <artifactId>netty-codec-http2</artifactId>
@@ -124,43 +150,27 @@
 
         <dependency>
             <groupId>org.apache.camel</groupId>
-            <artifactId>camel-http-common</artifactId>
-            <version>${camel-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-spring</artifactId>
-            <version>${camel-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>
-            <version>${camel-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
-            <artifactId>camel-http4</artifactId>
-            <version>${camel-version}</version>
+            <artifactId>camel-http</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-spring-boot</artifactId>
-            <version>${camel-version}</version>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jaxb</artifactId>
-            <version>${camel-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
-            <artifactId>camel-netty4-http</artifactId>
-            <version>${camel-version}</version>
+            <artifactId>camel-netty-http</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jsonpath</artifactId>
-            <version>${camel-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -192,75 +202,49 @@
             <version>${commons-io.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-spring-javaconfig</artifactId>
-            <version>${camel-version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
-            <artifactId>camel-test-spring</artifactId>
-            <version>${camel-version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-test</artifactId>
-            <version>${camel-version}</version>
+            <artifactId>camel-test-spring-junit5</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>${assertj-core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-contract-wiremock</artifactId>
-            <version>${spring-cloud-contract-wiremock.version}</version>
+            <groupId>org.wiremock.integrations</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>${wiremock-spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <version>${aws-java-sdk-s3.version}</version>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jackson</artifactId>
-            <version>${camel-version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
             <version>${jaxb-api.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
             <version>${jaxb-runtime.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.activation</groupId>
-            <artifactId>javax.activation</artifactId>
-            <version>${javax.activation.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.seratch</groupId>
-            <artifactId>jslack-api-client</artifactId>
-            <version>${jslack-api-client.version}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
@@ -269,7 +253,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -284,7 +267,28 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <release>11</release>
+                    <release>25</release>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>get-mockito-agent-path</id>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>
                 </configuration>
             </plugin>
         </plugins>

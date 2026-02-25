@@ -17,44 +17,39 @@ package org.entur.asag;
 
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.spring.boot.CamelSpringBootApplicationController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan({"org.entur.asag", "org.rutebanken.helper"})
-public class AsagApp extends RouteBuilder {
+public class AsagApp implements ApplicationRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(AsagApp.class);
 
-    @Produce(uri = "direct:uploadTiamatToMapboxAsGeoJson")
-    ProducerTemplate producerTemplate;
+    @Produce("direct:uploadTiamatToMapboxAsGeoJson")
+    private ProducerTemplate producerTemplate;
 
-    public static void main(String... args) throws Exception {
+    @Value("${asag.run.on.startup:true}")
+    private boolean runOnStartup;
+
+    public static void main(String[] args) {
         logger.info("Starting Asag ...");
-
-        ConfigurableApplicationContext applicationContext = new SpringApplicationBuilder(AsagApp.class)
-                .web(WebApplicationType.NONE)
-                .run(args);
-
-        CamelSpringBootApplicationController applicationController = applicationContext.getBean(CamelSpringBootApplicationController.class);
-
-        AsagApp asagApp = applicationContext.getBean(AsagApp.class);
-        asagApp.run();
-
-    }
-
-    private void run() {
-        producerTemplate.request("direct:uploadTiamatToMapboxAsGeoJson", System.out::println);
+        SpringApplication app = new SpringApplication(AsagApp.class);
+        app.setWebApplicationType(WebApplicationType.NONE);
+        app.run(args);
     }
 
     @Override
-    public void configure() throws Exception {
+    public void run(ApplicationArguments args) {
+        if (runOnStartup) {
+            producerTemplate.sendBody(null);
+        }
     }
 }

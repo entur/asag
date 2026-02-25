@@ -15,12 +15,9 @@
 
 package org.entur.asag;
 
-import org.apache.camel.builder.AdviceWithRouteBuilder;
-import org.apache.camel.model.ModelCamelContext;
-import org.apache.camel.test.spring.CamelSpringRunner;
-import org.apache.camel.test.spring.UseAdviceWith;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.apache.camel.CamelContext;
+import org.apache.camel.builder.AdviceWith;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,25 +25,19 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 
 @ActiveProfiles("test")
-@RunWith(CamelSpringRunner.class)
-@UseAdviceWith
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class AsagRouteBuilderIntegrationTestBase {
 
     @Autowired
-    protected ModelCamelContext context;
+    protected CamelContext context;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
     }
 
-    protected void replaceEndpoint(String routeId,String originalEndpoint,String replacementEndpoint) throws Exception {
-        context.getRouteDefinition(routeId).adviceWith(context, new AdviceWithRouteBuilder() {
-            @Override
-            public void configure() throws Exception {
-                interceptSendToEndpoint(originalEndpoint)
-                        .skipSendToOriginalEndpoint().to(replacementEndpoint);
-            }
-        });
+    protected void replaceEndpoint(String routeId, String originalEndpoint, String replacementEndpoint) throws Exception {
+        AdviceWith.adviceWith(context, routeId, a ->
+                a.interceptSendToEndpoint(originalEndpoint)
+                        .skipSendToOriginalEndpoint().to(replacementEndpoint));
     }
 }
