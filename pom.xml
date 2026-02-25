@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>4.7.0</version>
+        <version>5.3.0</version>
     </parent>
 
     <groupId>org.entur.asag</groupId>
@@ -41,9 +41,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <docker.maven.plugin.version>0.21.0</docker.maven.plugin.version>
         <httpcomponents.version>4.5.2</httpcomponents.version>
-        <camel-version>4.4.4</camel-version>
+        <camel-version>4.18.0</camel-version>
         <netex-java-model.version>2.0.15.2</netex-java-model.version>
-        <entur.helpers.version>2.7</entur.helpers.version>
+        <entur.helpers.version>6.1.0</entur.helpers.version>
         <guava.version>33.4.0-jre</guava.version>
         <geojson-jackson.version>1.8.1</geojson-jackson.version>
         <commons-compress.version>1.27.1</commons-compress.version>
@@ -99,7 +99,7 @@
         </dependency>
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
-            <artifactId>gcp-storage</artifactId>
+            <artifactId>storage-gcp-gcs</artifactId>
             <version>${entur.helpers.version}</version>
             <exclusions>
                 <exclusion>

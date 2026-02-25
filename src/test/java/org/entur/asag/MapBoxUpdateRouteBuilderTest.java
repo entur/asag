@@ -168,6 +168,7 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
     public void testNullBlobCausesRouteFailure() throws Exception {
         // Reset the blob stub from @Before so getBlob() returns null
         reset(blobStoreService);
+        FileUtils.deleteDirectory(new File("files/mapbox/tiamat"));
 
         boolean failed = false;
         try {
