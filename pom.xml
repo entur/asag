@@ -44,7 +44,7 @@
         <netex-java-model.version>2.0.15.2</netex-java-model.version>
         <entur.helpers.version>6.1.0</entur.helpers.version>
         <guava.version>33.5.0-jre</guava.version>
-        <geojson-jackson.version>3.0</geojson-jackson.version>
+        <geojson-jackson.version>1.14</geojson-jackson.version>
         <commons-compress.version>1.28.0</commons-compress.version>
         <commons-io.version>2.21.0</commons-io.version>
         <wiremock-spring-boot.version>4.1.0</wiremock-spring-boot.version>
