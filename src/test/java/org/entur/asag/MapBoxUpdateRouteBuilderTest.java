@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.wiremock.spring.EnableWireMock;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.io.File;
@@ -63,7 +63,7 @@ import static org.mockito.Mockito.when;
                 "camel.springboot.use-advice-with=true",
                 "asag.run.on.startup=false"
         })
-@AutoConfigureWireMock(port = 0)
+@EnableWireMock
 public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTestBase {
 
     private static final String TILESET_ID = "someId";
