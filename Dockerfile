@@ -6,4 +6,4 @@ RUN chown -R appuser:appuser /deployments
 USER appuser
 RUN mkdir -p /home/appuser/.ssh \
  && touch /home/appuser/.ssh/known_hosts
-CMD java $JAVA_OPTIONS -jar asag.jar
+CMD  [ "java", "-jar", "asag.jar"]
