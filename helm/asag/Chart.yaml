@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 appVersion: "0.1.99.2"
 description: mapbox updater
 name: asag
