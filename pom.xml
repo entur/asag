@@ -39,22 +39,23 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <docker.maven.plugin.version>0.21.0</docker.maven.plugin.version>
-        <httpcomponents.version>4.5.2</httpcomponents.version>
+        <httpcomponents.version>4.5.14</httpcomponents.version>
         <camel-version>4.18.0</camel-version>
         <netex-java-model.version>2.0.15.2</netex-java-model.version>
         <entur.helpers.version>6.1.0</entur.helpers.version>
-        <guava.version>33.4.0-jre</guava.version>
+        <guava.version>33.5.0-jre</guava.version>
         <geojson-jackson.version>1.8.1</geojson-jackson.version>
-        <commons-compress.version>1.27.1</commons-compress.version>
-        <commons-io.version>1.3.2</commons-io.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
+        <commons-io.version>2.21.0</commons-io.version>
         <spring-cloud-contract-wiremock.version>4.2.1</spring-cloud-contract-wiremock.version>
-        <jaxb-api.version>4.0.2</jaxb-api.version>
+        <jaxb-api.version>4.0.5</jaxb-api.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
-        <jslack-api-client.version>3.0.3</jslack-api-client.version>
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-        <aws-sdk-v2.version>2.28.14</aws-sdk-v2.version>
+        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <aws-sdk-v2.version>2.42.1</aws-sdk-v2.version>
         <mockito.version>5.20.0</mockito.version>
+        <logback.version>1.5.32</logback.version>
+        <assertj.version>3.27.7</assertj.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
     </properties>
 
 
@@ -83,6 +84,25 @@
                 <version>${aws-sdk-v2.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- Netty BOM - override transitive version (CVE-2025-67735) -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.1.131.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- okhttp/okio - override transitive versions from jslack (CVE-2023-0833, CVE-2023-3635) -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>4.12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio</artifactId>
+                <version>3.16.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -225,11 +245,6 @@
             <artifactId>jaxb-impl</artifactId>
             <version>${jaxb-runtime.version}</version>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.seratch</groupId>
-            <artifactId>jslack-api-client</artifactId>
-            <version>${jslack-api-client.version}</version>
         </dependency>
     </dependencies>
 
