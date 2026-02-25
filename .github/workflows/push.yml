@@ -63,7 +63,7 @@ jobs:
     steps:
       - run: echo "Approved
   helm-deploy-prod:
-    needs: [ helm-lint, docker-push ]
+    needs: [ approval-prd, helm-lint, docker-push ]
     uses: entur/gha-helm/.github/workflows/deploy.yml@v1
     with:
       environment: prd
