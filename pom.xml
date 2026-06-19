@@ -41,7 +41,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <httpcomponents.version>4.5.14</httpcomponents.version>
         <camel-version>4.18.0</camel-version>
-        <netex-java-model.version>2.0.15.2</netex-java-model.version>
+        <netex-java-model.version>2.0.16</netex-java-model.version>
         <entur.helpers.version>7.1.0</entur.helpers.version>
         <guava.version>33.5.0-jre</guava.version>
         <geojson-jackson.version>1.14</geojson-jackson.version>
