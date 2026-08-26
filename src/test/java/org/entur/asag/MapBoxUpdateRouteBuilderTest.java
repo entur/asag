@@ -86,7 +86,7 @@ public class MapBoxUpdateRouteBuilderTest extends AsagRouteBuilderIntegrationTes
     @Autowired
     private CamelContext context;
 
-    @Value("${tiamat.export.blobstore.subdirectory:tiamat/geocoder}")
+    @Value("${tiamat.export.blobstore.subdirectory:tiamat}")
     private String blobStoreSubdirectoryForTiamatGeoCoderExport;
 
     @Produce("direct:uploadTiamatToMapboxAsGeoJson")

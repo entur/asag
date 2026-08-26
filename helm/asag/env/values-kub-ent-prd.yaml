@@ -4,7 +4,7 @@ common:
     suspend: false
   configmap:
     data:
-      BLOBSTORE_GCS_PROJECT_ID: ent-kakka-prd
-      BLOBSTORE_GCS_CONTAINER_NAME: ror-kakka-production
+      BLOBSTORE_GCS_PROJECT_ID: ent-marduk-prd
+      BLOBSTORE_GCS_CONTAINER_NAME: marduk-production
       MAPBOX_TILESET_FILE_NAME: neon-1287
 

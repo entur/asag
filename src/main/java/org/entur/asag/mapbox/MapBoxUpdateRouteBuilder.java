@@ -42,7 +42,7 @@ public class MapBoxUpdateRouteBuilder extends RouteBuilder {
     public static final String LOOP_COUNTER = "LoopCounter";
     public static final String FILE_HANDLE = "FileHandle";
 
-    public static final String TIAMAT_EXPORT_LATEST_FILE_NAME = "tiamat_export_geocoder_latest.zip";
+    public static final String TIAMAT_EXPORT_LATEST_FILE_NAME = "Current_latest.zip";
 
     public static final String PROPERTY_STATE = "state";
     public static final String STATE_FINISHED = "finished";
@@ -50,9 +50,9 @@ public class MapBoxUpdateRouteBuilder extends RouteBuilder {
     public static final String STATE_TIMEOUT = "timeout";
 
     /**
-     * Use the same tiamat data as the geocoder
+     * Tiamat export as published by marduk
      */
-    @Value("${tiamat.export.blobstore.subdirectory:tiamat/geocoder}")
+    @Value("${tiamat.export.blobstore.subdirectory:tiamat}")
     private String blobStoreSubdirectoryForTiamatGeoCoderExport;
 
     @Value("${mapbox.download.directory:files/mapbox}")
