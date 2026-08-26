@@ -5,23 +5,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Test Commands
 
 ```bash
-# Full build + tests (requires Entur Artifactory credentials)
-mvn verify -s .github/workflows/settings.xml
+# Full build + tests
+mvn verify
 
 # Skip tests
-mvn package -DskipTests -s .github/workflows/settings.xml
+mvn package -DskipTests
 
 # Run all tests
-mvn test -s .github/workflows/settings.xml
+mvn test
 
 # Run a single test class
-mvn test -pl . -Dtest=StopPlaceToGeoJsonFeatureMapperTest -s .github/workflows/settings.xml
+mvn test -pl . -Dtest=StopPlaceToGeoJsonFeatureMapperTest
 
 # Run a single test method
-mvn test -Dtest=MapBoxUpdateRouteBuilderTest#testMapLayerDataSuccess -s .github/workflows/settings.xml
+mvn test -Dtest=MapBoxUpdateRouteBuilderTest#testMapLayerDataSuccess
 ```
 
-The settings file configures Entur's internal Artifactory for `org.entur.ror.helpers` (gcp-storage, slack) and `org.entur:netex-java-model`. Without it, these artifacts won't resolve. Java 17+ is required (`<release>17</release>` in compiler plugin).
+Entur's internal Artifactory (needed to resolve `org.entur.ror.helpers:*` (gcp-storage, slack), `org.entur:netex-java-model`, and the `superpom` parent itself) must be configured in your own `~/.m2/settings.xml` (server ids `central`/`snapshots` pointing at `entur2.jfrog.io`) — there is no repo-committed settings file anymore. The old `.github/workflows/settings.xml` was removed; CI (`.github/workflows/push.yml`) now runs plain `mvn verify` with no `-s` flag.
+
+Java **25** is required (`<release>25</release>` in the compiler plugin — this repo overrides the superpom default of Java 17). If you switch JDKs between builds, run `mvn clean` first: stale `target/` classes compiled under a different JDK cause a "class file version" mismatch at test time.
 
 ---
 
@@ -62,11 +64,13 @@ The `finalStopPlaceType` property on stop-place GeoJSON features is computed fro
 
 ## Testing Patterns
 
-Integration tests use `@ExtendWith(CamelSpringBootExtension.class)` (Camel 4 / JUnit 5 pattern). The property `camel.springboot.use-advice-with=true` prevents the context from autostarting — it is started manually in `@BeforeEach` after route advice is applied via `AdviceWith.adviceWith(...)`.
+Integration tests are plain `@SpringBootTest`-based — there is no `@ExtendWith(CamelSpringBootExtension.class)`; that class does not exist in the current `camel-test-spring-junit5`. The property `camel.springboot.use-advice-with=true` prevents the context from autostarting — it is started manually in `@BeforeEach` after route advice is applied via the static `AdviceWith.adviceWith(context, routeId, a -> ...)`.
+
+`@EnableWireMock` (from `org.wiremock.integrations:wiremock-spring-boot`) stubs Mapbox API endpoints and the Slack webhook. The WireMock port is injected via `${wiremock.server.port}` and overrides `mapbox.api.url` to `http://localhost:${wiremock.server.port}`.
 
 The `@ActiveProfiles("test")` annotation activates `TestConfig`, which replaces `BlobStoreService` with a Mockito mock. The mock returns a `FileInputStream` over `src/test/resources/stops.zip`.
 
-WireMock stubs Mapbox API endpoints and the Slack webhook. The WireMock port is injected via `${wiremock.server.port}` and overrides `mapbox.api.url` to `http://localhost:${wiremock.server.port}`.
+`asag.run.on.startup=false` must be set in `@SpringBootTest` properties, otherwise `AsagApp`'s `ApplicationRunner.run()` fires the whole pipeline during context startup, before `@BeforeEach` has a chance to wire up the WireMock stubs.
 
 `@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)` is used in `MapBoxUpdateRouteBuilderTest` because each test scenario leaves the Camel context in a different state.
 
@@ -81,7 +85,7 @@ All `@Value` fields live in `MapBoxUpdateRouteBuilder`. There is no `application
 | `mapbox.api.url` | `https://api.mapbox.com` | Standard HTTPS scheme for `camel-http` |
 | `mapbox.upload.status.max.retries` | `20` | Set to `3` in tests |
 | `mapbox.upload.status.poll.delay` | `20000` (ms) | Set to `0` in tests |
-| `tiamat.export.blobstore.subdirectory` | `tiamat/geocoder` | Sub-path in GCS bucket |
+| `tiamat.export.blobstore.subdirectory` | `tiamat` | Sub-path in GCS bucket |
 | `mapbox.aws.region` | `us-east-1` | |
 
 ---
@@ -90,14 +94,15 @@ All `@Value` fields live in `MapBoxUpdateRouteBuilder`. There is no `application
 
 | Component | Version | Notes |
 |-----------|---------|-------|
-| Parent POM | `org.entur.ror:superpom:4.7.0` | Manages Spring Boot 3.4.7 + Java 17 |
-| Spring Boot | 3.4.7 | Managed by superpom |
-| Apache Camel | 4.4.4 | Via `camel-spring-boot-bom` |
-| Java | 17 | `<release>17</release>` in compiler plugin |
-| AWS SDK | v2 (2.28.14) | `software.amazon.awssdk:s3` |
-| JAXB | `jakarta.xml.bind-api:4.0.2` | Jakarta EE 10 namespace |
-| JUnit | 5 (Jupiter) | Managed by Spring Boot 3 |
+| Parent POM | `org.entur.ror:superpom:6.4.0` | Manages Spring Boot 4.0.6; defaults Java to 17 |
+| Spring Boot | 4.0.6 | Managed by superpom |
+| Apache Camel | 4.18.0 | Via `camel-bom` + `camel-spring-boot-bom` (both required in `dependencyManagement`) |
+| Java | 25 | `<release>25</release>` in compiler plugin — overrides superpom's Java 17 default |
+| AWS SDK | v2 (`2.42.1`) | `software.amazon.awssdk:s3`, via `software.amazon.awssdk:bom` |
+| JAXB | `jakarta.xml.bind-api:4.0.5` + `com.sun.xml.bind:jaxb-impl:4.0.5` | Jakarta EE namespace |
+| JUnit | 5 (Jupiter) | Managed by Spring Boot |
+| `netex-java-model` | `2.0.16` | `org.entur:netex-java-model` |
+| `entur.helpers` | `7.1.0` | `org.entur.ror.helpers:storage-gcp-gcs`, `:slack` |
+| WireMock | `org.wiremock.integrations:wiremock-spring-boot:4.1.0` | `@EnableWireMock` in tests |
 
-**Pending**: `entur.helpers.version` (currently `2.0.0`) and `netex-java-model.version` (currently `2.0.13`) need verification against Entur Artifactory for Spring Boot 3 / Jakarta EE compatibility.
-
-**Docker**: Update base image from `adoptopenjdk/openjdk11:alpine-jre` to `eclipse-temurin:21-jre-alpine`.
+**Docker**: `eclipse-temurin:25-jre-alpine`.
