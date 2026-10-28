@@ -1,4 +1,4 @@
-FROM eclipse-temurin:25-jre-alpine
+FROM bellsoft/liberica-openjre-alpine:25.0.5.0.3-5
 WORKDIR /deployments
 COPY target/asag-*-SNAPSHOT.jar asag.jar
 RUN addgroup appuser && adduser --disabled-password appuser --ingroup appuser
